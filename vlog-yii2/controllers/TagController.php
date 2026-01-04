@@ -7,6 +7,9 @@ use app\models\Tag;
 use yii\data\ActiveDataProvider;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
+use app\models\Category;
+use Yii;
+
 
 final class TagController extends Controller
 {
@@ -34,5 +37,6 @@ final class TagController extends Controller
             'tag' => $tag,
             'dataProvider' => $dataProvider,
         ]);
+        $this->fillSidebar(null, $tag->slug);
     }
 }

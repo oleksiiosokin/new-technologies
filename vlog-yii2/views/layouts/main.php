@@ -12,6 +12,7 @@ use yii\bootstrap5\NavBar;
 
 AppAsset::register($this);
 
+$this->registerCssFile('@web/css/blog.css', ['depends' => [\app\assets\AppAsset::class]]);
 $this->registerCsrfMetaTags();
 $this->registerMetaTag(['charset' => Yii::$app->charset], 'charset');
 $this->registerMetaTag(['name' => 'viewport', 'content' => 'width=device-width, initial-scale=1, shrink-to-fit=no']);
@@ -23,6 +24,7 @@ $tags = $this->params['tags'] ?? [];
 $activeCategorySlug = $this->params['activeCategorySlug'] ?? null;
 $activeTagSlug = $this->params['activeTagSlug'] ?? null;
 ?>
+
 <?php $this->beginPage() ?>
 <!DOCTYPE html>
 <html lang="<?= Yii::$app->language ?>" class="h-100">
@@ -43,9 +45,8 @@ $activeTagSlug = $this->params['activeTagSlug'] ?? null;
     echo Nav::widget([
         'options' => ['class' => 'navbar-nav'],
         'items' => [
-            ['label' => 'Home', 'url' => ['/site/index']],
-            ['label' => 'About', 'url' => ['/site/about']],
-            ['label' => 'Contact', 'url' => ['/site/contact']],
+
+
             Yii::$app->user->isGuest
                 ? ['label' => 'Login', 'url' => ['/site/login']]
                 : '<li class="nav-item">'

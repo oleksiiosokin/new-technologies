@@ -8,36 +8,68 @@ use yii\widgets\LinkPager;
 /** @var app\models\Category $category */
 /** @var yii\data\ActiveDataProvider $dataProvider */
 
-$this->title = 'Category: ' . $category->name;
+$this->title = $category->name;
 
 $models = $dataProvider->getModels();
 $pagination = $dataProvider->getPagination();
 ?>
-<h1><?= Html::encode($this->title) ?></h1>
+
+<div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-3">
+    <div>
+        <h1 class="h3 mb-0"><?= Html::encode($this->title) ?></h1>
+        <div class="text-muted">Категорія</div>
+    </div>
+    <?= Html::a('← Усі пости', ['post/index'], ['class' => 'btn btn-sm btn-outline-secondary']) ?>
+</div>
 
 <?php if (empty($models)): ?>
-    <p>No posts in this category.</p>
+    <div class="card">
+        <div class="card-body text-muted">У цій категорії поки немає постів.</div>
+    </div>
 <?php else: ?>
     <?php foreach ($models as $post): ?>
-        <article style="margin-bottom: 24px; padding-bottom: 16px; border-bottom: 1px solid #ddd;">
-            <h2 style="margin-top:0;">
+        <div class="card post-card mb-3">
+            <div class="card-body">
+                <h2 class="h4 post-title mb-1">
+                    <?= Html::a(
+                        Html::encode($post->title),
+                        ['post/view', 'slug' => $post->slug],
+                        ['class' => 'text-decoration-none']
+                    ) ?>
+                </h2>
+
+                <div class="post-meta mb-2">
+                    <?= Html::encode(date('Y-m-d H:i', (int)($post->published_at ?? $post->created_at))) ?>
+                </div>
+
+                <p class="mb-3">
+                    <?= Html::encode(StringHelper::truncate(strip_tags($post->content), 220)) ?>
+                </p>
+
+                <?php if ($post->tags): ?>
+                    <div class="mb-3">
+                        <?php foreach ($post->tags as $tag): ?>
+                            <?= Html::a(
+                                Html::encode($tag->name),
+                                ['tag/view', 'slug' => $tag->slug],
+                                ['class' => 'badge text-bg-secondary me-1 mb-1 text-decoration-none']
+                            ) ?>
+                        <?php endforeach; ?>
+                    </div>
+                <?php endif; ?>
+
                 <?= Html::a(
-                    Html::encode($post->title),
-                    ['post/view', 'slug' => $post->slug]
+                    'Read more →',
+                    ['post/view', 'slug' => $post->slug],
+                    ['class' => 'btn btn-sm btn-outline-secondary btn-read']
                 ) ?>
-            </h2>
-
-            <div style="opacity: .7; font-size: 14px;">
-                <?= Html::encode(date('Y-m-d H:i', (int)($post->published_at ?? $post->created_at))) ?>
             </div>
-
-            <p><?= Html::encode(StringHelper::truncate(strip_tags($post->content), 220)) ?></p>
-        </article>
+        </div>
     <?php endforeach; ?>
 
     <?= LinkPager::widget([
         'pagination' => $pagination,
-        'options' => ['class' => 'pagination'],
+        'options' => ['class' => 'pagination justify-content-center mt-4'],
         'linkOptions' => ['class' => 'page-link'],
         'pageCssClass' => 'page-item',
         'activePageCssClass' => 'active',

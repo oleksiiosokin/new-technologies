@@ -7,61 +7,86 @@ use yii\widgets\LinkPager;
 /** @var yii\web\View $this */
 /** @var yii\data\ActiveDataProvider $dataProvider */
 
-$this->title = 'Blog';
+$this->title = 'Tech Blog';
+
 $models = $dataProvider->getModels();
 $pagination = $dataProvider->getPagination();
 ?>
-<h1><?= Html::encode($this->title) ?></h1>
+
+<div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-3">
+    <div>
+        <h1 class="h3 mb-0"><?= Html::encode($this->title) ?></h1>
+        <div class="text-muted">Новини, гайди та розбір сучасних технологій</div>
+    </div>
+</div>
 
 <?php if (empty($models)): ?>
-    <p>No posts yet.</p>
+    <div class="card">
+        <div class="card-body text-muted">Поки що немає постів.</div>
+    </div>
 <?php else: ?>
     <?php foreach ($models as $post): ?>
-        <article style="margin-bottom: 24px; padding-bottom: 16px; border-bottom: 1px solid #ddd;">
-            <h2 style="margin-top:0;">
-                <?= Html::a(
-                    Html::encode($post->title),
-                    ['post/view', 'slug' => $post->slug]
-                ) ?>
-            </h2>
+        <div class="card post-card mb-3">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-start gap-3">
+                    <div class="flex-grow-1">
+                        <h2 class="h4 post-title mb-1">
+                            <?= Html::a(
+                                Html::encode($post->title),
+                                ['post/view', 'slug' => $post->slug],
+                                ['class' => 'text-decoration-none']
+                            ) ?>
+                        </h2>
 
-            <div style="opacity: .7; font-size: 14px;">
-                <?= Html::encode(date('Y-m-d H:i', (int)($post->published_at ?? $post->created_at))) ?>
-                · Category: <?= Html::encode($post->category?->name ?? '—') ?>
-            </div>
+                        <div class="post-meta mb-2">
+                            <?= Html::encode(date('Y-m-d H:i', (int)($post->published_at ?? $post->created_at))) ?>
+                            ·
+                            <?= Html::a(
+                                Html::encode($post->category?->name ?? '—'),
+                                $post->category ? ['category/view', 'slug' => $post->category->slug] : ['post/index'],
+                                ['class' => 'text-decoration-none']
+                            ) ?>
+                        </div>
 
-            <?php if (!empty($post->image_path)): ?>
-                <div style="margin: 10px 0;">
-                    <?= Html::img('/' . ltrim($post->image_path, '/'), [
-                        'alt' => $post->title,
-                        'style' => 'max-width: 320px; height: auto; border-radius: 6px;',
-                    ]) ?>
-                </div>
-            <?php endif; ?>
+                        <p class="mb-3">
+                            <?= Html::encode(StringHelper::truncate(strip_tags($post->content), 220)) ?>
+                        </p>
 
-            <p>
-                <?= Html::encode(StringHelper::truncate(strip_tags($post->content), 220)) ?>
-            </p>
+                        <?php if ($post->tags): ?>
+                            <div class="mb-3">
+                                <?php foreach ($post->tags as $tag): ?>
+                                    <?= Html::a(
+                                        Html::encode($tag->name),
+                                        ['tag/view', 'slug' => $tag->slug],
+                                        ['class' => 'badge text-bg-secondary me-1 mb-1 text-decoration-none']
+                                    ) ?>
+                                <?php endforeach; ?>
+                            </div>
+                        <?php endif; ?>
 
-            <?php if ($post->tags): ?>
-                <div style="margin-top: 8px;">
-                    <?php foreach ($post->tags as $tag): ?>
                         <?= Html::a(
-                            Html::encode($tag->name),
-                            ['tag/view', 'slug' => $tag->slug],
-                            ['style' => 'display:inline-block; margin-right:6px; padding:2px 8px; border:1px solid #ccc; border-radius:999px; font-size:12px; text-decoration:none;']
+                            'Read more →',
+                            ['post/view', 'slug' => $post->slug],
+                            ['class' => 'btn btn-sm btn-outline-secondary btn-read']
                         ) ?>
-        <?php endforeach; ?>
-    </div>
-<?php endif; ?>
+                    </div>
 
-        </article>
+                    <?php if (!empty($post->image_path)): ?>
+                        <div class="d-none d-md-block" style="width: 190px;">
+                            <?= Html::img('/' . ltrim($post->image_path, '/'), [
+                                'alt' => $post->title,
+                                'class' => 'img-fluid post-cover',
+                            ]) ?>
+                        </div>
+                    <?php endif; ?>
+                </div>
+            </div>
+        </div>
     <?php endforeach; ?>
 
     <?= LinkPager::widget([
         'pagination' => $pagination,
-        // щоб пагінація не виглядала як голі цифри:
-        'options' => ['class' => 'pagination'],
+        'options' => ['class' => 'pagination justify-content-center mt-4'],
         'linkOptions' => ['class' => 'page-link'],
         'pageCssClass' => 'page-item',
         'activePageCssClass' => 'active',
