@@ -16,10 +16,11 @@ final class Comment extends ActiveRecord
     public function rules(): array
     {
         return [
-            [['post_id', 'author_name', 'content', 'created_at'], 'required'],
+            [['post_id', 'author_name', 'content'], 'required'],
             [['post_id', 'parent_id', 'status', 'created_at'], 'integer'],
             [['content'], 'string'],
             [['author_name'], 'string', 'max' => 80],
+            [['author_email'], 'email'],
             [['author_email'], 'string', 'max' => 120],
 
             [['post_id'], 'exist', 'skipOnError' => true, 'targetClass' => Post::class, 'targetAttribute' => ['post_id' => 'id']],
@@ -46,9 +47,12 @@ final class Comment extends ActiveRecord
     public function behaviors(): array
     {
         return [
-            TimestampBehavior::class => [
+            'timestamp' => [
+                'class' => TimestampBehavior::class,
+                'createdAtAttribute' => 'created_at',
                 'updatedAtAttribute' => false,
             ],
         ];
     }
+
 }

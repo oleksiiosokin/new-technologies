@@ -51,6 +51,7 @@ $config = [
             'post/<slug:[A-Za-z0-9\-_]+>' => 'post/view',
             'category/<slug:[A-Za-z0-9\-_]+>' => 'category/view',
             'tag/<slug:[A-Za-z0-9\-_]+>' => 'tag/view',
+            'post/<slug:[A-Za-z0-9\-_]+>/comment' => 'post/comment',
             ],
         ],
         

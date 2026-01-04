@@ -8,6 +8,8 @@ use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use app\models\Category;
 use app\models\Tag;
+use app\models\Comment;
+use yii\web\Response;
 use Yii;
 
 final class PostController extends Controller
@@ -24,7 +26,7 @@ final class PostController extends Controller
             'query' => $query,
             'pagination' => [
                 'pageSize' => 5,
-                'pageSizeParam' => false, // щоб юзер не крутив ?per-page=
+                'pageSizeParam' => false,
             ],
         ]);
 
@@ -43,11 +45,48 @@ final class PostController extends Controller
             throw new NotFoundHttpException('Post not found.');
         }
         $this->fillSidebar($model->category?->slug, null);
+        $newComment = new Comment();
+        $newComment->post_id = $model->id;
+
         return $this->render('view', [
             'model' => $model,
+            'newComment' => $newComment,
         ]);
 
     }
+
+    public function actionComment(string $slug): Response
+    {
+        $post = Post::find()
+            ->where(['slug' => $slug, 'status' => Post::STATUS_PUBLISHED])
+            ->one();
+
+        if ($post === null) {
+            throw new NotFoundHttpException('Post not found.');
+        }
+
+        $this->fillSidebar($post->category?->slug, null);
+
+        $comment = new Comment();
+        $comment->post_id = $post->id;
+
+        if ($comment->load(Yii::$app->request->post())) {
+            $comment->parent_id = $comment->parent_id ?: null;
+            $comment->status = 1;
+
+            if ($comment->save()) {
+                return $this->redirect(['post/view', 'slug' => $post->slug, '#' => 'comments']);
+            }
+        }
+
+        $newComment = $comment;
+
+        return $this->render('view', [
+            'model' => $post,
+            'newComment' => $newComment,
+        ]);
+    }
+
 
     private function fillSidebar(?string $activeCategorySlug = null, ?string $activeTagSlug = null): void
     {
@@ -63,5 +102,7 @@ final class PostController extends Controller
         Yii::$app->view->params['activeCategorySlug'] = $activeCategorySlug;
         Yii::$app->view->params['activeTagSlug'] = $activeTagSlug;
     }
+
+    
 
 }

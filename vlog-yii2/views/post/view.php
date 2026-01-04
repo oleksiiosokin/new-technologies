@@ -1,9 +1,12 @@
 <?php
 
 use yii\helpers\Html;
+use yii\widgets\ActiveForm;
 
 /** @var yii\web\View $this */
 /** @var app\models\Post $model */
+/** @var app\models\Comment $newComment */
+
 
 $this->title = $model->title;
 
@@ -15,6 +18,7 @@ $absoluteUrl = Yii::$app->urlManager->createAbsoluteUrl(['post/view', 'slug' => 
 $shareTelegram = 'https://t.me/share/url?' . http_build_query(['url' => $absoluteUrl, 'text' => $model->title]);
 $shareTwitter  = 'https://twitter.com/intent/tweet?' . http_build_query(['url' => $absoluteUrl, 'text' => $model->title]);
 $shareFacebook = 'https://www.facebook.com/sharer/sharer.php?' . http_build_query(['u' => $absoluteUrl]);
+$rootComments = $model->getComments()->with('replies')->all();
 ?>
 
 <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-3">
@@ -81,4 +85,69 @@ $shareFacebook = 'https://www.facebook.com/sharer/sharer.php?' . http_build_quer
         </div>
     </div>
 </div>
+<div id="comments" class="card">
+    <div class="card-header fw-semibold">Коментарі</div>
+    <div class="card-body">
+        <?php if (empty($rootComments)): ?>
+            <div class="text-muted">Поки що немає коментарів.</div>
+        <?php else: ?>
+            <?php foreach ($rootComments as $c): ?>
+                <div class="mb-3 pb-3 border-bottom">
+                    <div class="d-flex justify-content-between flex-wrap gap-2">
+                        <div>
+                            <strong><?= Html::encode($c->author_name) ?></strong>
+                            <span class="text-muted ms-2"><?= Html::encode(date('Y-m-d H:i', (int)$c->created_at)) ?></span>
+                        </div>
+                        <button class="btn btn-sm btn-outline-secondary"
+                                type="button"
+                                onclick="document.getElementById('comment-parent-id').value='<?= (int)$c->id ?>'; document.getElementById('comment-form-title').innerText='Відповідь користувачу <?=$c->author_name ?>'; document.getElementById('comment-author-name').focus();">
+                            Reply
+                        </button>
+                    </div>
 
+                    <div class="mt-2" style="white-space: pre-wrap;"><?= Html::encode($c->content) ?></div>
+
+                    <?php if ($c->replies): ?>
+                        <div class="mt-3 ms-3 ps-3 border-start">
+                            <?php foreach ($c->replies as $r): ?>
+                                <div class="mb-2">
+                                    <div>
+                                        <strong><?= Html::encode($r->author_name) ?></strong>
+                                        <span class="text-muted ms-2"><?= Html::encode(date('Y-m-d H:i', (int)$r->created_at)) ?></span>
+                                    </div>
+                                    <div style="white-space: pre-wrap;"><?= Html::encode($r->content) ?></div>
+                                </div>
+                            <?php endforeach; ?>
+                        </div>
+                    <?php endif; ?>
+                </div>
+            <?php endforeach; ?>
+        <?php endif; ?>
+
+        <hr class="my-4">
+
+        <h3 id="comment-form-title" class="h5 mb-3">Додати коментар</h3>
+
+        <?php $form = ActiveForm::begin([
+            'action' => ['post/comment', 'slug' => $model->slug],
+            'method' => 'post',
+        ]); ?>
+
+        <?= $form->field($newComment, 'parent_id')->hiddenInput(['id' => 'comment-parent-id'])->label(false) ?>
+
+        <?= $form->field($newComment, 'author_name')->textInput(['id' => 'comment-author-name', 'maxlength' => true]) ?>
+        <?= $form->field($newComment, 'author_email')->textInput(['maxlength' => true]) ?>
+        <?= $form->field($newComment, 'content')->textarea(['rows' => 4]) ?>
+
+        <div class="d-flex gap-2">
+            <?= Html::submitButton('Send', ['class' => 'btn btn-primary']) ?>
+            <?= Html::button('Cancel reply', [
+                'class' => 'btn btn-outline-secondary',
+                'type' => 'button',
+                'onclick' => "document.getElementById('comment-parent-id').value=''; document.getElementById('comment-form-title').innerText='Додати коментар';",
+            ]) ?>
+        </div>
+
+        <?php ActiveForm::end(); ?>
+    </div>
+</div>
