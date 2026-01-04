@@ -6,11 +6,16 @@ use app\models\Post;
 use yii\data\ActiveDataProvider;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
+use app\models\Category;
+use app\models\Tag;
+use Yii;
 
 final class PostController extends Controller
 {
     public function actionIndex(): string
     {
+        $this->fillSidebar(null, null);
+
         $query = Post::find()
             ->where(['status' => Post::STATUS_PUBLISHED])
             ->orderBy(['published_at' => SORT_DESC, 'created_at' => SORT_DESC]);
@@ -41,5 +46,23 @@ final class PostController extends Controller
         return $this->render('view', [
             'model' => $model,
         ]);
+        $this->fillSidebar($model->category?->slug, null);
+
     }
+
+    private function fillSidebar(?string $activeCategorySlug = null, ?string $activeTagSlug = null): void
+    {
+        Yii::$app->view->params['categories'] = Category::find()
+            ->orderBy(['name' => SORT_ASC])
+            ->all();
+
+        Yii::$app->view->params['tags'] = Tag::find()
+            ->orderBy(['name' => SORT_ASC])
+            ->limit(30)
+            ->all();
+
+        Yii::$app->view->params['activeCategorySlug'] = $activeCategorySlug;
+        Yii::$app->view->params['activeTagSlug'] = $activeTagSlug;
+    }
+
 }

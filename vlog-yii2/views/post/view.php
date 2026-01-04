@@ -12,7 +12,11 @@ $this->title = $model->title;
 
     <div style="opacity: .7; font-size: 14px; margin-bottom: 10px;">
         <?= Html::encode(date('Y-m-d H:i', (int)($model->published_at ?? $model->created_at))) ?>
-        · Category: <?= Html::encode($model->category?->name ?? '—') ?>
+        · Category:
+            <?= Html::a(
+                Html::encode($model->category?->name ?? '—'),
+                ['category/view', 'slug' => $model->category?->slug]
+            ) ?>
     </div>
 
     <?php if (!empty($model->image_path)): ?>
@@ -33,9 +37,11 @@ $this->title = $model->title;
         <div>
             <strong>Tags:</strong>
             <?php foreach ($model->tags as $tag): ?>
-                <span style="display:inline-block; margin-right:6px; padding:2px 8px; border:1px solid #ccc; border-radius:999px; font-size:12px;">
-                    <?= Html::encode($tag->name) ?>
-                </span>
+                <?= Html::a(
+                    Html::encode($tag->name),
+                    ['tag/view', 'slug' => $tag->slug],
+                    ['style' => 'display:inline-block; margin-right:6px; padding:2px 8px; border:1px solid #ccc; border-radius:999px; font-size:12px; text-decoration:none;']
+                ) ?>
             <?php endforeach; ?>
         </div>
     <?php endif; ?>

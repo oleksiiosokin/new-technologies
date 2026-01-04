@@ -5,16 +5,18 @@ use yii\helpers\StringHelper;
 use yii\widgets\LinkPager;
 
 /** @var yii\web\View $this */
+/** @var app\models\Tag $tag */
 /** @var yii\data\ActiveDataProvider $dataProvider */
 
-$this->title = 'Blog';
+$this->title = 'Tag: ' . $tag->name;
+
 $models = $dataProvider->getModels();
 $pagination = $dataProvider->getPagination();
 ?>
 <h1><?= Html::encode($this->title) ?></h1>
 
 <?php if (empty($models)): ?>
-    <p>No posts yet.</p>
+    <p>No posts with this tag.</p>
 <?php else: ?>
     <?php foreach ($models as $post): ?>
         <article style="margin-bottom: 24px; padding-bottom: 16px; border-bottom: 1px solid #ddd;">
@@ -27,40 +29,19 @@ $pagination = $dataProvider->getPagination();
 
             <div style="opacity: .7; font-size: 14px;">
                 <?= Html::encode(date('Y-m-d H:i', (int)($post->published_at ?? $post->created_at))) ?>
-                · Category: <?= Html::encode($post->category?->name ?? '—') ?>
+                · Category:
+                <?= Html::a(
+                    Html::encode($post->category?->name ?? '—'),
+                    ['category/view', 'slug' => $post->category?->slug]
+                ) ?>
             </div>
 
-            <?php if (!empty($post->image_path)): ?>
-                <div style="margin: 10px 0;">
-                    <?= Html::img('/' . ltrim($post->image_path, '/'), [
-                        'alt' => $post->title,
-                        'style' => 'max-width: 320px; height: auto; border-radius: 6px;',
-                    ]) ?>
-                </div>
-            <?php endif; ?>
-
-            <p>
-                <?= Html::encode(StringHelper::truncate(strip_tags($post->content), 220)) ?>
-            </p>
-
-            <?php if ($post->tags): ?>
-                <div style="margin-top: 8px;">
-                    <?php foreach ($post->tags as $tag): ?>
-                        <?= Html::a(
-                            Html::encode($tag->name),
-                            ['tag/view', 'slug' => $tag->slug],
-                            ['style' => 'display:inline-block; margin-right:6px; padding:2px 8px; border:1px solid #ccc; border-radius:999px; font-size:12px; text-decoration:none;']
-                        ) ?>
-        <?php endforeach; ?>
-    </div>
-<?php endif; ?>
-
+            <p><?= Html::encode(StringHelper::truncate(strip_tags($post->content), 220)) ?></p>
         </article>
     <?php endforeach; ?>
 
     <?= LinkPager::widget([
         'pagination' => $pagination,
-        // щоб пагінація не виглядала як голі цифри:
         'options' => ['class' => 'pagination'],
         'linkOptions' => ['class' => 'page-link'],
         'pageCssClass' => 'page-item',
