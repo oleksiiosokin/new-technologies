@@ -42,11 +42,10 @@ final class PostController extends Controller
         if ($model === null) {
             throw new NotFoundHttpException('Post not found.');
         }
-
+        $this->fillSidebar($model->category?->slug, null);
         return $this->render('view', [
             'model' => $model,
         ]);
-        $this->fillSidebar($model->category?->slug, null);
 
     }
 
