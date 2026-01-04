@@ -32,7 +32,7 @@ final class PostController extends Controller
             'dataProvider' => $dataProvider,
         ]);
     }
-
+ 
     public function actionView(string $slug): string
     {
         $model = Post::find()
