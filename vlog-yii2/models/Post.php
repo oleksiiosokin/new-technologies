@@ -6,7 +6,7 @@ use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
 use yii\behaviors\TimestampBehavior;
 
-final class Post extends ActiveRecord
+class Post extends ActiveRecord
 {
     public const STATUS_DRAFT = 0;
     public const STATUS_PUBLISHED = 1;
