@@ -4,6 +4,7 @@ namespace app\models;
 
 use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
+use yii\behaviors\TimestampBehavior;
 
 final class Post extends ActiveRecord
 {
@@ -45,5 +46,12 @@ final class Post extends ActiveRecord
         return $this->hasMany(Comment::class, ['post_id' => 'id'])
             ->andWhere(['parent_id' => null])
             ->orderBy(['created_at' => SORT_DESC]);
+    }
+
+    public function behaviors(): array
+    {
+        return [
+            TimestampBehavior::class,
+        ];
     }
 }

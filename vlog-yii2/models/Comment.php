@@ -4,6 +4,7 @@ namespace app\models;
 
 use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
+use yii\behaviors\TimestampBehavior;
 
 final class Comment extends ActiveRecord
 {
@@ -40,5 +41,14 @@ final class Comment extends ActiveRecord
     {
         return $this->hasMany(Comment::class, ['parent_id' => 'id'])
             ->orderBy(['created_at' => SORT_ASC]);
+    }
+
+    public function behaviors(): array
+    {
+        return [
+            TimestampBehavior::class => [
+                'updatedAtAttribute' => false,
+            ],
+        ];
     }
 }

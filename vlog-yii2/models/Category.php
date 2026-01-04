@@ -4,6 +4,8 @@ namespace app\models;
 
 use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
+use yii\behaviors\TimestampBehavior;
+
 
 final class Category extends ActiveRecord
 {
@@ -26,5 +28,12 @@ final class Category extends ActiveRecord
     public function getPosts(): ActiveQuery
     {
         return $this->hasMany(Post::class, ['category_id' => 'id']);
+    }
+
+    public function behaviors(): array
+    {
+        return [
+            TimestampBehavior::class,
+        ];
     }
 }
