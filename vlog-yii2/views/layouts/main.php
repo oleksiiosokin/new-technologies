@@ -41,23 +41,29 @@ $activeTagSlug = $this->params['activeTagSlug'] ?? null;
         'brandLabel' => Yii::$app->name,
         'brandUrl' => Yii::$app->homeUrl,
         'options' => ['class' => 'navbar-expand-md navbar-dark bg-dark fixed-top']
+        
     ]);
+
+    $menuItems = [];
+
+    if (!Yii::$app->user->isGuest) {
+        $menuItems[] = ['label' => 'Admin', 'url' => ['/admin/index']];
+    }
+
+    $menuItems[] = Yii::$app->user->isGuest
+        ? ['label' => 'Login', 'url' => ['/site/login']]
+        : '<li class="nav-item">'
+            . Html::beginForm(['/site/logout'])
+            . Html::submitButton(
+                'Logout (' . Yii::$app->user->identity->username . ')',
+                ['class' => 'nav-link btn btn-link logout']
+            )
+            . Html::endForm()
+            . '</li>';
+
     echo Nav::widget([
         'options' => ['class' => 'navbar-nav'],
-        'items' => [
-
-
-            Yii::$app->user->isGuest
-                ? ['label' => 'Login', 'url' => ['/site/login']]
-                : '<li class="nav-item">'
-                    . Html::beginForm(['/site/logout'])
-                    . Html::submitButton(
-                        'Logout (' . Yii::$app->user->identity->username . ')',
-                        ['class' => 'nav-link btn btn-link logout']
-                    )
-                    . Html::endForm()
-                    . '</li>'
-        ]
+        'items' => $menuItems,
     ]);
     NavBar::end();
     ?>
