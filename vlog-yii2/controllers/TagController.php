@@ -33,10 +33,27 @@ final class TagController extends Controller
             ],
         ]);
 
+        $this->fillSidebar(null, $tag->slug);
+        
         return $this->render('view', [
             'tag' => $tag,
             'dataProvider' => $dataProvider,
         ]);
-        $this->fillSidebar(null, $tag->slug);
+        
+    }
+
+    private function fillSidebar(?string $activeCategorySlug = null, ?string $activeTagSlug = null): void
+    {
+        Yii::$app->view->params['categories'] = Category::find()
+            ->orderBy(['name' => SORT_ASC])
+            ->all();
+
+        Yii::$app->view->params['tags'] = Tag::find()
+            ->orderBy(['name' => SORT_ASC])
+            ->limit(30)
+            ->all();
+
+        Yii::$app->view->params['activeCategorySlug'] = $activeCategorySlug;
+        Yii::$app->view->params['activeTagSlug'] = $activeTagSlug;
     }
 }

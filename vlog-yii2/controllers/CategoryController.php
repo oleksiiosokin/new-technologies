@@ -19,7 +19,7 @@ final class CategoryController extends Controller
         if ($category === null) {
             throw new NotFoundHttpException('Category not found.');
         }
-
+        $this->fillSidebar($category->slug, null);
         $query = Post::find()
             ->where([
                 'category_id' => $category->id,
@@ -27,6 +27,8 @@ final class CategoryController extends Controller
             ])
             ->orderBy(['published_at' => SORT_DESC, 'created_at' => SORT_DESC]);
 
+        
+            
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
             'pagination' => [
@@ -39,10 +41,9 @@ final class CategoryController extends Controller
             'category' => $category,
             'dataProvider' => $dataProvider,
         ]);
-        $this->fillSidebar($category->slug, null);
 
     }
-
+    
     private function fillSidebar(?string $activeCategorySlug = null, ?string $activeTagSlug = null): void
     {
         Yii::$app->view->params['categories'] = Category::find()
@@ -51,7 +52,6 @@ final class CategoryController extends Controller
 
         Yii::$app->view->params['tags'] = Tag::find()
             ->orderBy(['name' => SORT_ASC])
-            ->limit(30)
             ->all();
 
         Yii::$app->view->params['activeCategorySlug'] = $activeCategorySlug;
