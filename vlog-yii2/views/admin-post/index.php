@@ -29,23 +29,42 @@ $this->params['breadcrumbs'][] = $this->title;
         'columns' => [
             ['class' => 'yii\grid\SerialColumn'],
 
+            [
+                'label' => 'Img',
+                'format' => 'raw',
+                'value' => function($model) {
+                    return $model->image_path
+                        ? \yii\helpers\Html::img($model->image_path, [
+                            'style' => 'width:70px; height:auto; border-radius:6px;'
+                        ])
+                        : '';
+                },
+            ],
+
             'id',
-            'category_id',
             'title',
             'slug',
-            'content:ntext',
-            //'image_path',
-            //'status',
-            //'published_at',
-            //'created_at',
-            //'updated_at',
+
             [
-                'class' => ActionColumn::className(),
-                'urlCreator' => function ($action, Post $model, $key, $index, $column) {
-                    return Url::toRoute([$action, 'id' => $model->id]);
-                 }
+                'attribute' => 'content',
+                'value' => function($model) {
+                    $text = strip_tags((string)$model->content);
+                    return mb_strlen($text) > 120 ? mb_substr($text, 0, 120) . '…' : $text;
+                }
+            ],
+
+            [
+                'attribute' => 'published_at',
+                'value' => function($model) {
+                    return $model->published_at ? date('d.m.Y H:i', (int)$model->published_at) : '—';
+                }
+            ],
+
+            [
+                'class' => 'yii\grid\ActionColumn',
             ],
         ],
+
     ]); ?>
 
 

@@ -7,9 +7,14 @@ use yii\db\ActiveRecord;
 use yii\behaviors\TimestampBehavior;
 use yii\web\UploadedFile;
 use yii\helpers\FileHelper;
+use yii\helpers\Inflector;
+use yii\db\Expression;
+use Yii;
+
 
 class Post extends ActiveRecord
 {
+    public ?string $tagsInput = null;
     public $imageFile;
     public const STATUS_DRAFT = 0;
     public const STATUS_PUBLISHED = 1;
@@ -24,6 +29,8 @@ class Post extends ActiveRecord
         return [
             [['category_id', 'title', 'slug', 'content'], 'required'],
             [['category_id', 'status', 'created_at', 'updated_at'], 'integer'],
+            [['tagsInput'], 'string'],
+            [['tagsInput'], 'default', 'value' => ''],
             [['content'], 'string'],
             [['published_at'], 'safe'],
             [['title', 'slug', 'image_path'], 'string', 'max' => 255],
@@ -81,6 +88,22 @@ class Post extends ActiveRecord
         return parent::beforeValidate();
     }
 
+    public function beforeDelete()
+    {
+        if (!empty($this->image_path)) {
+            $full = Yii::getAlias('@webroot') . $this->image_path;
+            if (is_file($full)) {
+                @unlink($full);
+            }
+        }
+
+        Yii::$app->db->createCommand()
+            ->delete('{{%post_tag}}', ['post_id' => $this->id])
+            ->execute();
+
+        return parent::beforeDelete();
+    }
+
 
     public function uploadImage(): bool
     {
@@ -114,4 +137,94 @@ class Post extends ActiveRecord
         $this->image_path = '/uploads/posts/' . $newName;
         return true;
     }
+
+    public function afterSave($insert, $changedAttributes)
+    {
+        parent::afterSave($insert, $changedAttributes);
+        $this->syncTagsFromInput();
+    }
+
+    private function syncTagsFromInput(): void
+    {
+        $names = $this->parseTagsInput($this->tagsInput ?? '');
+
+        Yii::$app->db->createCommand()
+            ->delete('{{%post_tag}}', ['post_id' => $this->id])
+            ->execute();
+
+        if (empty($names)) {
+            return;
+        }
+
+        foreach ($names as $name) {
+            $tagId = $this->getOrCreateTagId($name);
+
+            Yii::$app->db->createCommand()
+                ->insert('{{%post_tag}}', [
+                    'post_id' => $this->id,
+                    'tag_id'  => $tagId,
+                ])->execute();
+        }
+    }
+
+    private function parseTagsInput(string $input): array
+    {
+        $raw = preg_split('/,/', $input);
+        $clean = [];
+
+        foreach ($raw as $item) {
+            $name = trim($item);
+            if ($name === '') continue;
+            $clean[] = $name;
+        }
+
+        $uniq = [];
+        $seen = [];
+        foreach ($clean as $name) {
+            $k = mb_strtolower($name);
+            if (isset($seen[$k])) continue;
+            $seen[$k] = true;
+            $uniq[] = $name;
+        }
+
+        return $uniq;
+    }
+
+    private function getOrCreateTagId(string $name): int
+    {
+        $tag = Tag::find()
+            ->where(new Expression('LOWER([[name]]) = :n', [':n' => mb_strtolower($name)]))
+            ->one();
+
+        if ($tag) {
+            return (int)$tag->id;
+        }
+
+        $tag = new Tag();
+        $tag->name = $name;
+
+        $baseSlug = Inflector::slug($name);
+        $slug = $baseSlug ?: ('tag-' . time());
+
+        $i = 2;
+        while (Tag::find()->where(['slug' => $slug])->exists()) {
+            $slug = $baseSlug . '-' . $i;
+            $i++;
+        }
+
+        $tag->slug = $slug;
+
+        if (!$tag->save()) {
+            $tag2 = Tag::find()
+                ->where(new Expression('LOWER([[name]]) = :n', [':n' => mb_strtolower($name)]))
+                ->one();
+            if ($tag2) return (int)$tag2->id;
+
+            throw new \RuntimeException('Не вдалося створити тег: ' . json_encode($tag->errors, JSON_UNESCAPED_UNICODE));
+        }
+
+        return (int)$tag->id;
+    }
+
+
 }

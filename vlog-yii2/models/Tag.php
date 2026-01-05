@@ -19,6 +19,7 @@ final class Tag extends ActiveRecord
             [['name'], 'string', 'max' => 60],
             [['slug'], 'string', 'max' => 80],
             [['slug'], 'unique'],
+            [['name'], 'unique'],
         ];
     }
 

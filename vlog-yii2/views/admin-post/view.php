@@ -34,11 +34,33 @@ $this->params['breadcrumbs'][] = $this->title;
             'title',
             'slug',
             'content:ntext',
-            'image_path',
+            [
+                'attribute' => 'image_path',
+                'format' => 'raw',
+                'value' => $model->image_path
+                    ? Html::img($model->image_path, ['style' => 'max-width:600px; max-height:350px; border-radius:8px;'])
+                    : '—',
+            ],
             'status',
-            'published_at',
-            'created_at',
-            'updated_at',
+            [
+                'attribute' => 'published_at',
+                'value' => $model->published_at ? date('d.m.Y H:i', (int)$model->published_at) : '—',
+            ],
+            [
+                'attribute' => 'created_at',
+                'value' => $model->created_at ? date('d.m.Y H:i', (int)$model->created_at) : '—',
+            ],
+            [
+                'attribute' => 'updated_at',
+                'value' => $model->updated_at ? date('d.m.Y H:i', (int)$model->updated_at) : '—',
+            ],
+            [
+                'label' => 'Tags',
+                'format' => 'raw',
+                'value' => $model->tags
+                    ? Html::encode(implode(', ', array_map(fn($t) => $t->name, $model->tags)))
+                    : '—',
+            ],
         ],
     ]) ?>
 

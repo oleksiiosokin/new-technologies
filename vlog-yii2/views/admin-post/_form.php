@@ -32,6 +32,11 @@ $categories = ArrayHelper::map(
     <?= $form->field($model, 'slug')->textInput(['maxlength' => true]) ?>
 
     <?= $form->field($model, 'content')->textarea(['rows' => 8]) ?>
+    
+    <?= $form->field($model, 'tagsInput')
+    ->textInput(['placeholder' => 'Напр: php, yii2, security'])
+    ->hint('Вводь через кому. Існуючі теги повторно не створюються.') ?>
+
 
     <?= $form->field($model, 'status')->dropDownList([
         1 => 'Опубліковано',
@@ -58,6 +63,7 @@ $categories = ArrayHelper::map(
             ['class' => 'btn btn-success']
         ) ?>
     </div>
+    
 
 <?php ActiveForm::end(); ?>
 
