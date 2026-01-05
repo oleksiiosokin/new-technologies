@@ -5,7 +5,7 @@ use yii\helpers\Html;
 use yii\helpers\Url;
 use yii\grid\ActionColumn;
 use yii\grid\GridView;
-
+use yii\bootstrap5\LinkPager;
 /** @var yii\web\View $this */
 /** @var app\models\PostSearch $searchModel */
 /** @var yii\data\ActiveDataProvider $dataProvider */
@@ -21,11 +21,20 @@ $this->params['breadcrumbs'][] = $this->title;
         <?= Html::a('Create Post', ['create'], ['class' => 'btn btn-success']) ?>
     </p>
 
-    <?php // echo $this->render('_search', ['model' => $searchModel]); ?>
+    <?php echo $this->render('_search', ['model' => $searchModel]); ?>
 
     <?= GridView::widget([
         'dataProvider' => $dataProvider,
-        'filterModel' => $searchModel,
+        'pager' => [
+            'class' => LinkPager::class,
+            'options' => ['class' => 'pagination justify-content-center mt-4'],
+            'pageCssClass' => 'page-item',
+            'linkOptions' => ['class' => 'page-link'],
+            'activePageCssClass' => 'active',
+            'disabledPageCssClass' => 'disabled',
+            'prevPageLabel' => '«',
+            'nextPageLabel' => '»',
+        ],
         'columns' => [
             ['class' => 'yii\grid\SerialColumn'],
 
@@ -43,7 +52,6 @@ $this->params['breadcrumbs'][] = $this->title;
 
             'id',
             'title',
-            'slug',
 
             [
                 'attribute' => 'content',

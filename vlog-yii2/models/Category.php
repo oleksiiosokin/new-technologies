@@ -5,9 +5,12 @@ namespace app\models;
 use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
 use yii\behaviors\TimestampBehavior;
+use yii\behaviors\SluggableBehavior;
+use yii\helpers\Inflector;
 
 
-final class Category extends ActiveRecord
+
+class Category extends ActiveRecord
 {
     public static function tableName(): string
     {
@@ -17,7 +20,7 @@ final class Category extends ActiveRecord
     public function rules(): array
     {
         return [
-            [['name', 'slug'], 'required'],
+            [['name'], 'required'],
             [['name'], 'string', 'max' => 100],
             [['slug'], 'string', 'max' => 120],
             [['slug'], 'unique'],
@@ -32,8 +35,31 @@ final class Category extends ActiveRecord
 
     public function behaviors(): array
     {
-        return [
-            TimestampBehavior::class,
+        $behaviors = [
+            [
+                'class' => SluggableBehavior::class,
+                'attribute' => 'name',
+                'slugAttribute' => 'slug',
+                'ensureUnique' => true,
+                // щоб не перезатирало slug при оновленні, якщо вже є
+                'immutable' => true,
+                'value' => function () {
+                    $base = Inflector::slug((string)$this->name);
+                    return $base !== '' ? $base : ('category-' . time());
+                },
+            ],
         ];
+
+        // timestamps тільки якщо в таблиці реально є created_at/updated_at
+        if ($this->hasAttribute('created_at') && $this->hasAttribute('updated_at')) {
+            $behaviors[] = [
+                'class' => TimestampBehavior::class,
+                'createdAtAttribute' => 'created_at',
+                'updatedAtAttribute' => 'updated_at',
+            ];
+        }
+
+        return $behaviors;
     }
+
 }

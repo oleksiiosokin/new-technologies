@@ -4,29 +4,22 @@ use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 
 /** @var yii\web\View $this */
-/** @var app\models\PostSearch $model */
-/** @var yii\widgets\ActiveForm $form */
+/** @var app\models\CategorySearch $model */
+
 ?>
 
-<div class="post-search">
-
+<div class="category-search">
     <?php $form = ActiveForm::begin([
         'action' => ['index'],
         'method' => 'get',
     ]); ?>
 
-    <?= $form->field($model, 'title') ?>
-
-    <?= $form->field($model, 'content') ?>
-
-    <?= $form->field($model, 'published_at_text') ?>
+    <?= $form->field($model, 'name')->label('Name') ?>
 
     <div class="form-group">
         <?= Html::submitButton('Search', ['class' => 'btn btn-primary']) ?>
         <?= Html::a('Reset', ['index'], ['class' => 'btn btn-outline-secondary']) ?>
-
     </div>
 
     <?php ActiveForm::end(); ?>
-
 </div>

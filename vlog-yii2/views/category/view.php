@@ -2,7 +2,7 @@
 
 use yii\helpers\Html;
 use yii\helpers\StringHelper;
-use yii\widgets\LinkPager;
+use yii\bootstrap5\LinkPager;
 
 /** @var yii\web\View $this */
 /** @var app\models\Category $category */

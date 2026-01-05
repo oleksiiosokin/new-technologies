@@ -16,9 +16,5 @@ $this->title = 'Admin';
             <?= Html::a('Categories', ['admin-category/index'], ['class' => 'btn btn-outline-secondary']) ?>
             <?= Html::a('Tags', ['admin-tag/index'], ['class' => 'btn btn-outline-secondary']) ?>
         </div>
-
-        <div class="text-muted mt-3">
-            Тут буде керування контентом блогу.
-        </div>
     </div>
 </div>

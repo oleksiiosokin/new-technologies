@@ -20,25 +20,25 @@ class AdminPostController extends Controller
      * @inheritDoc
      */
     public function behaviors()
-{
-    return array_merge(parent::behaviors(), [
-        'access' => [
-            'class' => AccessControl::class,
-            'rules' => [
-                [
-                    'allow' => true,
-                    'roles' => ['@'],
+    {
+        return array_merge(parent::behaviors(), [
+            'access' => [
+                'class' => AccessControl::class,
+                'rules' => [
+                    [
+                        'allow' => true,
+                        'roles' => ['@'],
+                    ],
                 ],
             ],
-        ],
-        'verbs' => [
-            'class' => VerbFilter::class,
-            'actions' => [
-                'delete' => ['POST'],
+            'verbs' => [
+                'class' => VerbFilter::class,
+                'actions' => [
+                    'delete' => ['POST'],
+                ],
             ],
-        ],
-    ]);
-}
+        ]);
+    }
 
 
     /**
