@@ -78,39 +78,76 @@ class AdminPostController extends Controller
     public function actionCreate()
     {
         $model = new Post();
+        $model->loadDefaultValues();
 
-        if ($this->request->isPost) {
-            if ($model->load($this->request->post()) && $model->save()) {
+        if ($this->request->isPost && $model->load($this->request->post())) {
+
+            $now = time();
+            $model->created_at = $now;
+            $model->updated_at = $now;
+
+            $rawPublishedAt = $this->request->post('Post')['published_at'] ?? null;
+            if ($rawPublishedAt !== null && $rawPublishedAt !== '') {
+                $ts = strtotime($rawPublishedAt);
+                $model->published_at = ($ts !== false) ? $ts : null;
+            } else {
+                $model->published_at = null;
+            }
+
+            if ((int)$model->status !== Post::STATUS_PUBLISHED) {
+                $model->published_at = null;
+            } elseif ($model->published_at === null) {
+                $model->published_at = $now;
+            }
+
+            if (!$model->uploadImage()) {
+                return $this->render('create', ['model' => $model]);
+            }
+
+            if ($model->save()) {
                 return $this->redirect(['view', 'id' => $model->id]);
             }
-        } else {
-            $model->loadDefaultValues();
         }
 
-        return $this->render('create', [
-            'model' => $model,
-        ]);
+        return $this->render('create', ['model' => $model]);
     }
 
-    /**
-     * Updates an existing Post model.
-     * If update is successful, the browser will be redirected to the 'view' page.
-     * @param int $id
-     * @return string|\yii\web\Response
-     * @throws NotFoundHttpException if the model cannot be found
-     */
     public function actionUpdate($id)
     {
         $model = $this->findModel($id);
 
-        if ($this->request->isPost && $model->load($this->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
+        if ($this->request->isPost && $model->load($this->request->post())) {
+
+            $now = time();
+            $model->updated_at = $now;
+
+            $rawPublishedAt = $this->request->post('Post')['published_at'] ?? null;
+            if ($rawPublishedAt !== null && $rawPublishedAt !== '') {
+                $ts = strtotime($rawPublishedAt);
+                $model->published_at = ($ts !== false) ? $ts : null;
+            } else {
+                $model->published_at = null;
+            }
+
+            if ((int)$model->status !== Post::STATUS_PUBLISHED) {
+                $model->published_at = null;
+            } elseif ($model->published_at === null) {
+                $model->published_at = $now;
+            }
+
+            if (!$model->uploadImage()) {
+                return $this->render('update', ['model' => $model]);
+            }
+
+            if ($model->save()) {
+                return $this->redirect(['view', 'id' => $model->id]);
+            }
         }
 
-        return $this->render('update', [
-            'model' => $model,
-        ]);
+        return $this->render('update', ['model' => $model]);
     }
+
+
 
     /**
      * Deletes an existing Post model.
