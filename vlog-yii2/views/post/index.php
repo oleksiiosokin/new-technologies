@@ -2,7 +2,7 @@
 
 use yii\helpers\Html;
 use yii\helpers\StringHelper;
-use yii\widgets\LinkPager;
+use yii\bootstrap5\LinkPager;
 
 /** @var yii\web\View $this */
 /** @var yii\data\ActiveDataProvider $dataProvider */
@@ -30,6 +30,14 @@ $pagination = $dataProvider->getPagination();
             <div class="card-body">
                 <div class="d-flex justify-content-between align-items-start gap-3">
                     <div class="flex-grow-1">
+                        <?php if (!empty($post->image_path)): ?>
+                        <div class="post-cover-wrap mb-3">
+                            <?= Html::img('/' . ltrim($post->image_path, '/'), [
+                                'alt' => $post->title,
+                                'class' => 'img-fluid post-cover',
+                            ]) ?>
+                        </div>
+                    <?php endif; ?>
                         <h2 class="h4 post-title mb-1">
                             <?= Html::a(
                                 Html::encode($post->title),
@@ -38,15 +46,29 @@ $pagination = $dataProvider->getPagination();
                             ) ?>
                         </h2>
 
+                        <?php
+                        $publishedTs = (int)($post->published_at ?: $post->created_at);
+                        $updatedTs   = (int)($post->updated_at ?: 0);
+                        $createdTs   = (int)($post->created_at ?: 0);
+
+                        $showUpdated = $updatedTs && $createdTs && $updatedTs > $createdTs;
+                        ?>
                         <div class="post-meta mb-2">
-                            <?= Html::encode(date('Y-m-d H:i', (int)($post->published_at ?? $post->created_at))) ?>
-                            ·
+                            <span><strong>Опубліковано:</strong> <?= Html::encode(date('d-m-Y H:i', $publishedTs)) ?></span>
+
+                            <?php if ($showUpdated): ?>
+                                <span class="ms-3"><strong>Оновлено:</strong> <?= Html::encode(date('d-m-Y H:i', $updatedTs)) ?></span>
+                            <?php endif; ?>
+
+                            <span class="mx-2">·</span>
+                                
                             <?= Html::a(
                                 Html::encode($post->category?->name ?? '—'),
                                 $post->category ? ['category/view', 'slug' => $post->category->slug] : ['post/index'],
                                 ['class' => 'text-decoration-none']
                             ) ?>
                         </div>
+
 
                         <p class="mb-3">
                             <?= Html::encode(StringHelper::truncate(strip_tags($post->content), 220)) ?>
@@ -71,14 +93,7 @@ $pagination = $dataProvider->getPagination();
                         ) ?>
                     </div>
 
-                    <?php if (!empty($post->image_path)): ?>
-                        <div class="d-none d-md-block" style="width: 190px;">
-                            <?= Html::img('/' . ltrim($post->image_path, '/'), [
-                                'alt' => $post->title,
-                                'class' => 'img-fluid post-cover',
-                            ]) ?>
-                        </div>
-                    <?php endif; ?>
+                    
                 </div>
             </div>
         </div>

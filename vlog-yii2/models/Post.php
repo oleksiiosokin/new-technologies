@@ -2,6 +2,7 @@
 
 namespace app\models;
 
+use yii\behaviors\SluggableBehavior;
 use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
 use yii\behaviors\TimestampBehavior;
@@ -27,7 +28,7 @@ class Post extends ActiveRecord
     public function rules(): array
     {
         return [
-            [['category_id', 'title', 'slug', 'content'], 'required'],
+            [['category_id', 'title', 'content'], 'required'],
             [['category_id', 'status', 'created_at', 'updated_at'], 'integer'],
             [['tagsInput'], 'string'],
             [['tagsInput'], 'default', 'value' => ''],
@@ -59,18 +60,31 @@ class Post extends ActiveRecord
 
     public function getComments(): ActiveQuery
     {
-        // тільки кореневі коментарі (без відповідей)
         return $this->hasMany(Comment::class, ['post_id' => 'id'])
             ->andWhere(['parent_id' => null])
             ->orderBy(['created_at' => SORT_DESC]);
     }
 
     public function behaviors(): array
-    {
-        return [
-            TimestampBehavior::class,
-        ];
-    }
+{
+    return [
+        [
+            'class' => SluggableBehavior::class,
+            'attribute' => 'title',
+            'slugAttribute' => 'slug',
+            'ensureUnique' => true,
+            'value' => function () {
+                if (!empty($this->slug)) {
+                    return $this->slug;
+                }
+                $base = Inflector::slug((string)$this->title);
+                return $base !== '' ? $base : ('post-' . time());
+            },
+        ],
+        TimestampBehavior::class,
+    ];
+}
+
 
     public function beforeValidate(): bool
     {

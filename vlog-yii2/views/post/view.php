@@ -10,8 +10,14 @@ use yii\widgets\ActiveForm;
 
 $this->title = $model->title;
 
-$publishedTs = (int)($model->published_at ?? $model->created_at);
-$publishedLabel = date('Y-m-d H:i', $publishedTs);
+$publishedTs = (int)($model->published_at ?: $model->created_at);
+$updatedTs   = (int)($model->updated_at ?: 0);
+$createdTs   = (int)($model->created_at ?: 0);
+
+$publishedLabel = date('d-m-Y H:i', $publishedTs);
+
+$showUpdated = $updatedTs && $createdTs && $updatedTs > $createdTs;
+$updatedLabel = $showUpdated ? date('d-m-Y H:i', $updatedTs) : null;
 
 $absoluteUrl = Yii::$app->urlManager->createAbsoluteUrl(['post/view', 'slug' => $model->slug]);
 
@@ -25,14 +31,21 @@ $rootComments = $model->getComments()->with('replies')->all();
     <div>
         <h1 class="h3 mb-0"><?= Html::encode($model->title) ?></h1>
         <div class="post-meta mt-1">
-            <?= Html::encode($publishedLabel) ?>
-            ·
+            <span><strong>Опубліковано:</strong> <?= Html::encode($publishedLabel) ?></span>
+
+            <?php if ($showUpdated): ?>
+                <span class="ms-3"><strong>Оновлено:</strong> <?= Html::encode($updatedLabel) ?></span>
+            <?php endif; ?>
+
+            <span class="mx-2">·</span>
+
             <?= Html::a(
                 Html::encode($model->category?->name ?? '—'),
                 $model->category ? ['category/view', 'slug' => $model->category->slug] : ['post/index'],
                 ['class' => 'text-decoration-none']
             ) ?>
         </div>
+
     </div>
 
     <div class="d-flex gap-2">
@@ -44,11 +57,11 @@ $rootComments = $model->getComments()->with('replies')->all();
 <div class="card mb-4">
     <div class="card-body">
         <?php if (!empty($model->image_path)): ?>
-            <div class="mb-3">
+            <div class="post-cover-wrap mb-3">
                 <?= Html::img('/' . ltrim($model->image_path, '/'), [
                     'alt' => $model->title,
                     'class' => 'img-fluid post-cover',
-                    'style' => 'width:100%; max-height: 420px; object-fit: cover;',
+                    'style' => 'width:100%',
                 ]) ?>
             </div>
         <?php endif; ?>
