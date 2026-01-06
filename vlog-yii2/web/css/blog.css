@@ -10,9 +10,6 @@
   --border: #A2A8D3;    /* Лавандовий для рамок */
 }
 
-#main {
-  padding-top: 12px;
-}
 
 body {
   background: var(--bg);
@@ -33,7 +30,7 @@ a:hover {
 }
 
 .container {
-  max-width: 1100px;
+  max-width: 1280px;
 }
 
 
@@ -63,18 +60,17 @@ a:hover {
   color: var(--primary) !important;
 }
 
-/* Cards (Пости і Сайдбар) */
 .card {
   background-color: var(--card);
-  border: 1px solid rgba(162, 168, 211, 0.4); /* Напівпрозорий бордер */
+  border: 1px solid rgba(162, 168, 211, 0.4); 
   border-radius: 16px;
-  box-shadow: 0 4px 15px rgba(56, 89, 139, 0.03); /* Дуже легка синя тінь */
+  box-shadow: 0 4px 15px rgba(56, 89, 139, 0.03);
   transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
 }
 
 .card:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 10px 30px rgba(56, 89, 139, 0.12) !important;
+  transform: translateY(-1px);
+  box-shadow: 0 10px 30px rgba(56, 89, 139, 0.11) !important;
   border-color: var(--primary);
 }
 
@@ -100,7 +96,7 @@ a:hover {
   border: 0;
   border-bottom: 1px solid var(--border);
   color: var(--text);
-  padding: 12px 0;
+  padding: 12px 12px;
 }
 
 .list-group-item:last-child {
@@ -111,8 +107,8 @@ a:hover {
   background: transparent;
   color: var(--primary);
   font-weight: 800;
-  padding-left: 8px;
-  border-left: 4px solid var(--primary); /* Активний елемент зліва */
+  padding-left: 12px;
+  border-left: 4px solid var(--primary);
 }
 
 /* Buttons */
@@ -123,7 +119,7 @@ a:hover {
   border-radius: 12px;
   padding: 8px 22px;
   font-weight: 600;
-  box-shadow: 0 4px 12px rgba(56, 89, 139, 0.2); /* Тінь під кнопкою */
+  box-shadow: 0 4px 12px rgba(56, 89, 139, 0.2);
 }
 
 .btn-primary:hover {
@@ -145,7 +141,7 @@ a:hover {
 
 /* Tags */
 .badge.text-bg-secondary {
-  background-color: var(--bg) !important; /* Колір фону сайту */
+  background-color: var(--bg) !important;
   color: var(--primary) !important;
   border: 1px solid var(--border);
   font-weight: 500;
@@ -168,7 +164,6 @@ a:hover {
   box-shadow: 0 0 0 4px rgba(162, 168, 211, 0.25); /* Лавандове світіння */
 }
 
-/* Post Meta */
 .post-meta {
   color: var(--muted);
 }
@@ -240,8 +235,8 @@ a:hover {
   .sidebar{
     position: sticky;
     color: rgba(255,255,255,0);
-    top: 72px;               
-    height: calc(100vh - 72px);
+    top: 24px;               
+    height: calc(100vh - 24px);
     overflow: auto;
   }
 }

@@ -83,10 +83,10 @@ $activeTagSlug = $this->params['activeTagSlug'] ?? null;
 </header>
 
 <main id="main" class="flex-shrink-0" role="main">
-    <div class="container-fluid px-0">
+    <div class="container"> <div class="row">
         <div class="row g-0">
 
-            <aside class="col-12 col-md-3 col-xl-2 sidebar">
+            <aside class="col-12 col-md-4 col-lg-3 sidebar">
                 <div class="p-3 p-lg-4 h-100"> <div class="card sidebar-search-card mb-3">
                         <div class="card-body">
                             <div class="sidebar-search-title">Пошук</div>
@@ -178,7 +178,7 @@ $activeTagSlug = $this->params['activeTagSlug'] ?? null;
                 </div> 
             </aside>
 
-            <div class="col-12 col-md-9 col-xl-10 content-area">
+            <div class="col-12 col-md-8 col-lg-9 content-area">
                 <div class="p-3 p-lg-4">
                     <?php if (!empty($this->params['breadcrumbs'])): ?>
                         <?= Breadcrumbs::widget(['links' => $this->params['breadcrumbs']]) ?>
@@ -273,6 +273,15 @@ $activeTagSlug = $this->params['activeTagSlug'] ?? null;
     bindFilter('tagFilter', 'tagList');
 })();
 </script>
+
+<footer id="footer" class="mt-auto py-3 bg-light">
+    <div class="container">
+        <div class="row text-muted">
+            <div class="col-md-6 text-center text-md-start">&copy; Osokin O. <?= date('Y') ?></div>
+            <div class="col-md-6 text-center text-md-end"><?= Yii::powered() ?></div>
+        </div>
+    </div>
+</footer>
 
 <?php $this->endBody() ?>
 </body>
