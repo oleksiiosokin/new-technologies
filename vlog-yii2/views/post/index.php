@@ -7,18 +7,10 @@ use yii\bootstrap5\LinkPager;
 /** @var yii\web\View $this */
 /** @var yii\data\ActiveDataProvider $dataProvider */
 
-$this->title = 'Tech Blog';
-
 $models = $dataProvider->getModels();
 $pagination = $dataProvider->getPagination();
 ?>
-
-<div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-3">
-    <div>
-        <h1 class="h3 mb-0"><?= Html::encode($this->title) ?></h1>
-        <div class="text-muted">Новини, гайди та розбір сучасних технологій</div>
-    </div>
-</div>
+<?php $q = $searchModel->q ?? ''; ?>
 
 <?php if (empty($models)): ?>
     <div class="card">

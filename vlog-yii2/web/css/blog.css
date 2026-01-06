@@ -7,6 +7,10 @@
   --border: rgba(33,42,62,.10);
 }
 
+#main{
+  padding-top: 72px;
+}
+
 /* Base */
 body{
   background: var(--bg);
@@ -24,6 +28,8 @@ a:hover{ color: var(--primary-2); text-decoration: underline; }
 .navbar{
   background: rgba(33,42,62,.92) !important;
   backdrop-filter: blur(10px);
+  padding-top: 10px;
+  padding-bottom: 10px;
 }
 .navbar .navbar-brand{ font-weight: 700; letter-spacing: .2px; }
 .navbar .nav-link{ color: rgba(255,255,255,.85) !important; }
@@ -111,3 +117,127 @@ a:hover{ color: var(--primary-2); text-decoration: underline; }
   display: block;
 }
 
+
+.navbar .container{
+  display: flex;
+  align-items: center;
+}
+
+
+.navbar-brand-left{
+  display: flex;
+  align-items: center;
+}
+
+.navbar-brand-left img{
+  height: 56px;
+  width: auto;
+  display: block;
+}
+
+.navbar-brand-center{
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  font-weight: 700;
+  letter-spacing: .3px;
+  color: #fff !important;
+  
+}
+
+@media (min-width: 992px){
+  .sidebar{
+    position: sticky;
+    top: 72px;               
+    height: calc(100vh - 72px);
+    overflow: auto;
+  }
+}
+
+
+.navbar .nav-link.btn.btn-link{
+  color: rgba(255,255,255,.88) !important;
+  padding: 8px 12px;
+  border-radius: 12px;
+  background: rgba(255,255,255,.06);
+  text-decoration: none;
+}
+.navbar .nav-link.btn.btn-link:hover{
+  background: rgba(255,255,255,.10);
+}
+
+.sidebar{
+  background: var(--card);
+  border-right: 1px solid var(--border);
+  min-height: calc(100vh - 72px);
+}
+
+.sidebar{
+  background: rgba(255,255,255,.70);
+  backdrop-filter: blur(6px);
+}
+
+
+.sidebar .card{
+  box-shadow: none;      /* в сайдбарі тінь зайва */
+  border-radius: 14px;
+}
+
+.content-inner{ max-width: 1100px; }
+
+.toolbar-search .form-control{
+  min-width: 320px;
+  border-radius: 12px;
+}
+
+@media (max-width: 576px){
+  .toolbar-search,
+  .toolbar-search form{
+    width: 100%;
+  }
+  .toolbar-search .form-control{
+    min-width: 100%;
+  }
+}
+
+/* Sidebar search */
+.sidebar-search-card{
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  box-shadow: none; /* у сайдбарі тінь зайва */
+}
+
+.sidebar-search-title{
+  font-weight: 700;
+  color: var(--primary-2);
+  margin-bottom: 10px;
+  font-size: .95rem;
+}
+
+.sidebar-search-form{
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 8px;
+  align-items: center;
+}
+
+.sidebar-search-input{
+  border-radius: 12px;
+  border: 1px solid var(--border);
+}
+
+.sidebar-search-input:focus{
+  border-color: rgba(57,72,103,.35);
+  box-shadow: 0 0 0 .2rem rgba(57,72,103,.12);
+}
+
+.sidebar-search-btn{
+  border-radius: 12px;
+  padding: 8px 12px;
+}
+
+.sidebar-search-clear{
+  border-radius: 12px;
+  padding: 8px 10px;
+  line-height: 1;
+}

@@ -11,11 +11,12 @@ use yii\data\ActiveDataProvider;
 class PostSearch extends Post
 {
     public $published_at_text;
+    public $q;
 
     public function rules(): array
     {
         return [
-            [['title', 'content', 'published_at_text'], 'safe'],
+            [['title', 'content', 'published_at_text', 'q'], 'safe'],
         ];
     }
 
@@ -43,6 +44,11 @@ class PostSearch extends Post
         if (!$this->validate()) {
             return $dataProvider;
         }
+
+        $query->andFilterWhere(['or',
+            ['like', 'title', $this->q],
+            ['like', 'content', $this->q],
+        ]);
 
         $query->andFilterWhere(['like', 'title', $this->title])
               ->andFilterWhere(['like', 'content', $this->content]);

@@ -10,6 +10,7 @@ use yii\bootstrap5\Html;
 use yii\bootstrap5\Nav;
 use yii\bootstrap5\NavBar;
 
+
 AppAsset::register($this);
 
 $this->registerCssFile('@web/css/blog.css', ['depends' => [\app\assets\AppAsset::class]]);
@@ -24,7 +25,7 @@ $tags = $this->params['tags'] ?? [];
 $activeCategorySlug = $this->params['activeCategorySlug'] ?? null;
 $activeTagSlug = $this->params['activeTagSlug'] ?? null;
 ?>
-
+<?php $q = trim((string)Yii::$app->request->get('q', '')); ?>
 <?php $this->beginPage() ?>
 <!DOCTYPE html>
 <html lang="<?= Yii::$app->language ?>" class="h-100">
@@ -38,41 +39,78 @@ $activeTagSlug = $this->params['activeTagSlug'] ?? null;
 <header id="header">
     <?php
     NavBar::begin([
-        'brandLabel' => Yii::$app->name,
-        'brandUrl' => Yii::$app->homeUrl,
-        'options' => ['class' => 'navbar-expand-md navbar-dark bg-dark fixed-top']
-        
+        'options' => [
+            'class' => 'navbar navbar-expand-md navbar-dark fixed-top'
+        ],
+        'innerContainerOptions' => [
+            'class' => 'container position-relative'
+        ],
     ]);
+?>
+        <a class="navbar-brand-left d-flex align-items-center" href="<?= Yii::$app->homeUrl ?>">
+        <img src="<?= Yii::getAlias('@web/images/Logo.png') ?>" alt="Logo">
+    </a>
 
+    <a class="navbar-brand navbar-brand-center" href="<?= Yii::$app->homeUrl ?>">
+        TechHouse
+    </a>
+
+    <?php
     $menuItems = [];
 
-    if (!Yii::$app->user->isGuest) {
-        $menuItems[] = ['label' => 'Admin', 'url' => ['/admin/index']];
-    }
+        if (!Yii::$app->user->isGuest && (int)Yii::$app->user->identity->is_admin === 1) {
+            $menuItems[] = ['label' => 'Admin', 'url' => ['/admin/index']];
+        }
 
-    $menuItems[] = Yii::$app->user->isGuest
-        ? ['label' => 'Login', 'url' => ['/site/login']]
-        : '<li class="nav-item">'
-            . Html::beginForm(['/site/logout'])
-            . Html::submitButton(
-                'Logout (' . Yii::$app->user->identity->username . ')',
-                ['class' => 'nav-link btn btn-link logout']
-            )
-            . Html::endForm()
-            . '</li>';
+        $menuItems[] = Yii::$app->user->isGuest
+            ? ['label' => 'Login', 'url' => ['/site/login']]
+            : '<li class="nav-item">'
+                . Html::beginForm(['/site/logout'], 'post')
+                . Html::submitButton(
+                    'Logout (' . Yii::$app->user->identity->username . ')',
+                    ['class' => 'nav-link btn btn-link logout']
+                )
+                . Html::endForm()
+                . '</li>';
 
-    echo Nav::widget([
-        'options' => ['class' => 'navbar-nav'],
-        'items' => $menuItems,
-    ]);
+        echo Nav::widget([
+            'options' => ['class' => 'navbar-nav ms-auto'],
+            'items' => array_filter($menuItems),
+        ]);
+
     NavBar::end();
     ?>
 </header>
 
 <main id="main" class="flex-shrink-0" role="main">
-    <div class="container my-4">
-        <div class="row">
-            <aside class="col-12 col-lg-3 mb-4">
+    <div class="container-fluid px-0">
+        <div class="row g-0">
+
+            <aside class="col-12 col-md-3 col-xl-2 sidebar">
+                <div class="card sidebar-search-card mb-3">
+                    <div class="card-body">
+                        <div class="sidebar-search-title">Пошук</div>
+
+                        <?= Html::beginForm(['post/index'], 'get', ['class' => 'sidebar-search-form']) ?>
+                            <?= Html::textInput('q', $q, [
+                                'class' => 'form-control sidebar-search-input',
+                                'placeholder' => 'Назва або текст…',
+                                'autocomplete' => 'off',
+                            ]) ?>
+
+                            <?= Html::submitButton('Go', ['class' => 'btn btn-primary sidebar-search-btn']) ?>
+
+                            <?php if ($q !== ''): ?>
+                                <?= Html::a('×', ['post/index'], [
+                                    'class' => 'btn btn-outline-secondary sidebar-search-clear',
+                                    'title' => 'Очистити',
+                                    'aria-label' => 'Очистити',
+                                ]) ?>
+                            <?php endif; ?>
+                        <?= Html::endForm() ?>
+                    </div>
+                </div>
+
                 <div class="card mb-3">
                     <div class="card-header fw-semibold">Категорії</div>
                     <div class="list-group list-group-flush">
@@ -110,27 +148,19 @@ $activeTagSlug = $this->params['activeTagSlug'] ?? null;
                 </div>
             </aside>
 
-            <div class="col-12 col-lg-9">
-                <?php if (!empty($this->params['breadcrumbs'])): ?>
-                    <?= Breadcrumbs::widget(['links' => $this->params['breadcrumbs']]) ?>
-                <?php endif ?>
-                <?= Alert::widget() ?>
-                <?= $content ?>
+            <div class="col-12 col-md-9 col-xl-10 content-area">
+                <div class="p-3 p-lg-4">
+                    <?php if (!empty($this->params['breadcrumbs'])): ?>
+                        <?= Breadcrumbs::widget(['links' => $this->params['breadcrumbs']]) ?>
+                    <?php endif ?>
+                    <?= Alert::widget() ?>
+                    <?= $content ?>
+                </div>
             </div>
+
         </div>
     </div>
 </main>
-
-
-
-<footer id="footer" class="mt-auto py-3 bg-light">
-    <div class="container">
-        <div class="row text-muted">
-            <div class="col-md-6 text-center text-md-start">&copy; My Company <?= date('Y') ?></div>
-            <div class="col-md-6 text-center text-md-end"><?= Yii::powered() ?></div>
-        </div>
-    </div>
-</footer>
 
 <?php $this->endBody() ?>
 </body>

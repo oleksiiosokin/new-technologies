@@ -22,6 +22,15 @@ final class PostController extends Controller
             ->where(['status' => Post::STATUS_PUBLISHED])
             ->orderBy(['published_at' => SORT_DESC, 'created_at' => SORT_DESC]);
 
+        $q = trim((string)Yii::$app->request->get('q', ''));
+
+        if ($q !== '') {
+            $query->andFilterWhere(['or',
+                ['like', 'title', $q],
+                ['like', 'content', $q],
+            ]);
+        }
+
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
             'pagination' => [
