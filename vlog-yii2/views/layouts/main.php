@@ -120,7 +120,11 @@ $activeTagSlug = $this->params['activeTagSlug'] ?? null;
                             ['class' => 'list-group-item list-group-item-action' . (($activeCategorySlug === null && $activeTagSlug === null) ? ' active' : '')]
                         ) ?>
 
-                        <?php foreach ($categories as $cat): ?>
+                        <?php
+                        $maxCats = 8;
+                        $catsLimited = array_slice($categories, 0, $maxCats);
+                        ?>
+                        <?php foreach ($catsLimited as $cat): ?>
                             <?= Html::a(
                                 Html::encode($cat->name),
                                 ['category/view', 'slug' => $cat->slug],
@@ -128,6 +132,16 @@ $activeTagSlug = $this->params['activeTagSlug'] ?? null;
                             ) ?>
                         <?php endforeach; ?>
                     </div>
+                    <?php if (count($categories) > $maxCats): ?>
+                            <div class="p-2">
+                                <button class="btn btn-sm btn-outline-secondary w-100"
+                                        type="button"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#allCategoriesModal">
+                                    Показати всі категорії (<?= count($categories) ?>)
+                                </button>
+                            </div>
+                        <?php endif; ?>
                 </div>
 
                 <div class="card">
@@ -136,13 +150,28 @@ $activeTagSlug = $this->params['activeTagSlug'] ?? null;
                         <?php if (empty($tags)): ?>
                             <div class="text-muted">Нема тегів</div>
                         <?php else: ?>
-                            <?php foreach ($tags as $tag): ?>
+                            <?php
+                            $maxTags = 12;
+                            $tagsLimited = array_slice($tags, 0, $maxTags);
+                            ?>
+                            <?php foreach ($tagsLimited as $tag): ?>
                                 <?= Html::a(
                                     Html::encode($tag->name),
                                     ['tag/view', 'slug' => $tag->slug],
                                     ['class' => 'badge text-bg-' . ($activeTagSlug === $tag->slug ? 'primary' : 'secondary') . ' me-1 mb-1 text-decoration-none']
                                 ) ?>
                             <?php endforeach; ?>
+                            <?php if (count($tags) > $maxTags): ?>
+                                <div class="mt-2">
+                                    <button class="btn btn-sm btn-outline-secondary w-100"
+                                            type="button"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#allTagsModal">
+                                        Показати всі теги (<?= count($tags) ?>)
+                                    </button>
+                                </div>
+                            <?php endif; ?>
+                                    
                         <?php endif; ?>
                     </div>
                 </div>
@@ -161,6 +190,88 @@ $activeTagSlug = $this->params['activeTagSlug'] ?? null;
         </div>
     </div>
 </main>
+<!-- All Categories Modal -->
+<div class="modal fade" id="allCategoriesModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Всі категорії</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <input id="catFilter" type="text" class="form-control mb-3" placeholder="Пошук категорій...">
+
+                <div class="list-group" id="catList">
+                    <?= Html::a(
+                        'Усі пости',
+                        ['post/index'],
+                        ['class' => 'list-group-item list-group-item-action' . (($activeCategorySlug === null && $activeTagSlug === null) ? ' active' : '')]
+                    ) ?>
+
+                    <?php foreach ($categories as $cat): ?>
+                        <?= Html::a(
+                            Html::encode($cat->name),
+                            ['category/view', 'slug' => $cat->slug],
+                            [
+                                'class' => 'list-group-item list-group-item-action' . ($activeCategorySlug === $cat->slug ? ' active' : ''),
+                                'data-name' => mb_strtolower($cat->name),
+                            ]
+                        ) ?>
+                    <?php endforeach; ?>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="allTagsModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Всі теги</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <input id="tagFilter" type="text" class="form-control mb-3" placeholder="Пошук тегів...">
+
+                <div class="d-flex flex-wrap gap-2" id="tagList">
+                    <?php foreach ($tags as $tag): ?>
+                        <?= Html::a(
+                            Html::encode($tag->name),
+                            ['tag/view', 'slug' => $tag->slug],
+                            [
+                                'class' => 'badge text-bg-' . ($activeTagSlug === $tag->slug ? 'primary' : 'secondary') . ' text-decoration-none tag-pill',
+                                'data-name' => mb_strtolower($tag->name),
+                            ]
+                        ) ?>
+                    <?php endforeach; ?>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+(function () {
+    function bindFilter(inputId, containerId) {
+        const input = document.getElementById(inputId);
+        const container = document.getElementById(containerId);
+        if (!input || !container) return;
+
+        input.addEventListener('input', function () {
+            const q = (input.value || '').trim().toLowerCase();
+            const items = container.querySelectorAll('[data-name]');
+            items.forEach(el => {
+                const name = (el.getAttribute('data-name') || '');
+                el.style.display = name.includes(q) ? '' : 'none';
+            });
+        });
+    }
+
+    bindFilter('catFilter', 'catList');
+    bindFilter('tagFilter', 'tagList');
+})();
+</script>
 
 <?php $this->endBody() ?>
 </body>

@@ -13,7 +13,7 @@ use yii\web\Response;
 use Yii;
 use yii\filters\VerbFilter;
 use yii\web\ForbiddenHttpException;
-
+use yii\data\Pagination;
 
 final class PostController extends Controller
 {
@@ -74,9 +74,47 @@ final class PostController extends Controller
         $newComment = new Comment();
         $newComment->post_id = $model->id;
 
+        $commentQuery = Comment::find()
+            ->where([
+                'post_id' => $model->id,
+                'status' => 1,
+                'parent_id' => null,
+            ])
+            ->orderBy(['created_at' => SORT_DESC]);
+
+        $commentPagination = new Pagination([
+            'totalCount' => (int)$commentQuery->count(),
+            'pageSize' => 5,
+            'pageParam' => 'cpage',
+            'params' => array_merge(Yii::$app->request->get(), ['slug' => $slug]),
+        ]);
+
+        $comments = $commentQuery
+            ->offset($commentPagination->offset)
+            ->limit($commentPagination->limit)
+            ->all();
+
+        $rootIds = array_map(static fn($c) => (int)$c->id, $comments);
+
+        $repliesByParent = [];
+        if (!empty($rootIds)) {
+            $replies = Comment::find()
+                ->where(['status' => 1])
+                ->andWhere(['parent_id' => $rootIds])
+                ->orderBy(['created_at' => SORT_ASC])
+                ->all();
+
+            foreach ($replies as $r) {
+                $repliesByParent[(int)$r->parent_id][] = $r;
+            }
+        }
+
         return $this->render('view', [
             'model' => $model,
             'newComment' => $newComment,
+            'comments' => $comments,
+            'repliesByParent' => $repliesByParent,
+            'commentPagination' => $commentPagination,
         ]);
 
     }
@@ -99,6 +137,17 @@ final class PostController extends Controller
         if ($comment->load(Yii::$app->request->post())) {
             $comment->parent_id = $comment->parent_id ?: null;
             $comment->status = 1;
+
+            $last = Comment::find()
+                ->where(['author_name' => $comment->author_name, 'post_id' => $post->id])
+                ->orderBy(['created_at' => SORT_DESC])
+                ->one();
+
+            if ($last && (time() - (int)$last->created_at) < 30) {
+                Yii::$app->session->setFlash('error', 'Занадто часто. Спробуй через 30 сек.');
+                return $this->redirect(['post/view', 'slug' => $slug, '#' => 'comments']);
+            }
+
 
             if ($comment->save()) {
                 return $this->redirect(['post/view', 'slug' => $post->slug, '#' => 'comments']);

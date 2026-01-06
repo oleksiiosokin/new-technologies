@@ -241,3 +241,8 @@ a:hover{ color: var(--primary-2); text-decoration: underline; }
   padding: 8px 10px;
   line-height: 1;
 }
+
+.tag-pill{
+  padding: .45rem .6rem;
+  border-radius: 999px;
+}

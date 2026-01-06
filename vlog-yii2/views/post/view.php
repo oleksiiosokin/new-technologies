@@ -2,11 +2,15 @@
 
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
+use yii\bootstrap5\LinkPager;
+
 
 /** @var yii\web\View $this */
 /** @var app\models\Post $model */
 /** @var app\models\Comment $newComment */
-
+/** @var app\models\Comment[] $comments */
+/** @var array<int, app\models\Comment[]> $repliesByParent */
+/** @var yii\data\Pagination $commentPagination */
 
 $this->title = $model->title;
 
@@ -24,7 +28,6 @@ $absoluteUrl = Yii::$app->urlManager->createAbsoluteUrl(['post/view', 'slug' => 
 $shareTelegram = 'https://t.me/share/url?' . http_build_query(['url' => $absoluteUrl, 'text' => $model->title]);
 $shareTwitter  = 'https://twitter.com/intent/tweet?' . http_build_query(['url' => $absoluteUrl, 'text' => $model->title]);
 $shareFacebook = 'https://www.facebook.com/sharer/sharer.php?' . http_build_query(['u' => $absoluteUrl]);
-$rootComments = $model->getComments()->with('replies')->all();
 ?>
 
 <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-3">
@@ -101,10 +104,11 @@ $rootComments = $model->getComments()->with('replies')->all();
 <div id="comments" class="card">
     <div class="card-header fw-semibold">Коментарі</div>
     <div class="card-body">
-        <?php if (empty($rootComments)): ?>
+
+        <?php if (empty($comments)): ?>
             <div class="text-muted">Поки що немає коментарів.</div>
         <?php else: ?>
-            <?php foreach ($rootComments as $c): ?>
+            <?php foreach ($comments as $c): ?>
                 <div class="mb-3 pb-3 border-bottom">
                     <div class="d-flex justify-content-between flex-wrap gap-2">
                         <div>
@@ -131,12 +135,12 @@ $rootComments = $model->getComments()->with('replies')->all();
                         </div>
                     </div>
 
-
                     <div class="mt-2" style="white-space: pre-wrap;"><?= Html::encode($c->content) ?></div>
 
-                    <?php if ($c->replies): ?>
+                    <?php $replies = $repliesByParent[(int)$c->id] ?? []; ?>
+                    <?php if (!empty($replies)): ?>
                         <div class="mt-3 ms-3 ps-3 border-start">
-                            <?php foreach ($c->replies as $r): ?>
+                            <?php foreach ($replies as $r): ?>
                                 <div class="mb-2">
                                     <div class="d-flex justify-content-between align-items-center">
                                         <div>
@@ -146,7 +150,7 @@ $rootComments = $model->getComments()->with('replies')->all();
 
                                         <?php if (!Yii::$app->user->isGuest && (int)Yii::$app->user->identity->is_admin === 1): ?>
                                             <?= Html::a('Delete', ['post/delete-comment', 'id' => (int)$r->id, 'slug' => $model->slug], [
-                                                'class' => 'btn btn-sm btn-outline-danger', // Класи як у головної кнопки
+                                                'class' => 'btn btn-sm btn-outline-danger',
                                                 'data' => [
                                                     'method' => 'post',
                                                     'confirm' => 'Видалити цю відповідь?',
@@ -162,6 +166,14 @@ $rootComments = $model->getComments()->with('replies')->all();
                     <?php endif; ?>
                 </div>
             <?php endforeach; ?>
+
+            <?php if ($commentPagination->totalCount > $commentPagination->pageSize): ?>
+                <div class="mt-3">
+                    <?= LinkPager::widget([
+                        'pagination' => $commentPagination,
+                    ]) ?>
+                </div>
+            <?php endif; ?>
         <?php endif; ?>
 
         <hr class="my-4">

@@ -20,6 +20,8 @@ final class Comment extends ActiveRecord
             [['post_id', 'parent_id', 'status', 'created_at'], 'integer'],
             [['content'], 'string'],
             [['author_name'], 'string', 'max' => 80],
+            [['author_name', 'content'], 'trim'],
+            ['content', 'string', 'min' => 2, 'max' => 1000],
             [['author_email'], 'email'],
             [['author_email'], 'string', 'max' => 120],
 

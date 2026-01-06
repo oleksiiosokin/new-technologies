@@ -66,24 +66,24 @@ class Post extends ActiveRecord
     }
 
     public function behaviors(): array
-{
-    return [
-        [
-            'class' => SluggableBehavior::class,
-            'attribute' => 'title',
-            'slugAttribute' => 'slug',
-            'ensureUnique' => true,
-            'value' => function () {
-                if (!empty($this->slug)) {
-                    return $this->slug;
-                }
-                $base = Inflector::slug((string)$this->title);
-                return $base !== '' ? $base : ('post-' . time());
-            },
-        ],
-        TimestampBehavior::class,
-    ];
-}
+    {
+        return [
+            [
+                'class' => SluggableBehavior::class,
+                'attribute' => 'title',
+                'slugAttribute' => 'slug',
+                'ensureUnique' => true,
+                'value' => function () {
+                    if (!empty($this->slug)) {
+                        return $this->slug;
+                    }
+                    $base = Inflector::slug((string)$this->title);
+                    return $base !== '' ? $base : ('post-' . time());
+                },
+            ],
+            TimestampBehavior::class,
+        ];
+    }
 
 
     public function beforeValidate(): bool
@@ -239,6 +239,8 @@ class Post extends ActiveRecord
 
         return (int)$tag->id;
     }
+
+    
 
 
 }
