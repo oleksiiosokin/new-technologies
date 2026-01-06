@@ -48,10 +48,10 @@ $activeTagSlug = $this->params['activeTagSlug'] ?? null;
     
 ?>
         <a class="navbar-brand-left d-flex align-items-center" href="<?= Yii::$app->homeUrl ?>">
-        <img src="<?= Yii::getAlias('@web/images/Logo.png') ?>" alt="Logo">
+        <img src="<?= Yii::getAlias('@web/images/Logo1.png') ?>" alt="Logo">
     </a>
 
-    <a class="navbar-brand navbar-brand-center" href="<?= Yii::$app->homeUrl ?>">
+    <a class="navbar-brand navbar-brand-left" href="<?= Yii::$app->homeUrl ?>">
         TechHouse
     </a>
 
@@ -120,8 +120,11 @@ $activeTagSlug = $this->params['activeTagSlug'] ?? null;
                                 ['post/index'],
                                 ['class' => 'list-group-item list-group-item-action' . (($activeCategorySlug === null && $activeTagSlug === null) ? ' active' : '')]
                             ) ?>
-
-                            <?php foreach ($categories as $cat): ?>
+                            <?php
+                            $maxCats = 8;
+                            $catsLimited = array_slice($categories, 0, $maxCats);
+                            ?>
+                            <?php foreach ($catsLimited as $cat): ?>
                                 <?= Html::a(
                                     Html::encode($cat->name),
                                     ['category/view', 'slug' => $cat->slug],
@@ -129,6 +132,16 @@ $activeTagSlug = $this->params['activeTagSlug'] ?? null;
                                 ) ?>
                             <?php endforeach; ?>
                         </div>
+                        <?php if (count($categories) > $maxCats): ?>
+                            <div class="p-2">
+                                <button class="btn btn-sm btn-outline-secondary w-100"
+                                        type="button"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#allCategoriesModal">
+                                    Показати всі категорії (<?= count($categories) ?>)
+                                </button>
+                            </div>
+                        <?php endif; ?>
                     </div>
 
                     <div class="card">
@@ -137,13 +150,27 @@ $activeTagSlug = $this->params['activeTagSlug'] ?? null;
                             <?php if (empty($tags)): ?>
                                 <div class="text-muted">Нема тегів</div>
                             <?php else: ?>
-                                <?php foreach ($tags as $tag): ?>
+                                <?php
+                                $maxTags = 12;
+                                $tagsLimited = array_slice($tags, 0, $maxTags);
+                                ?>
+                                <?php foreach ($tagsLimited as $tag): ?>
                                     <?= Html::a(
                                         Html::encode($tag->name),
                                         ['tag/view', 'slug' => $tag->slug],
                                         ['class' => 'badge text-bg-' . ($activeTagSlug === $tag->slug ? 'primary' : 'secondary') . ' me-1 mb-1 text-decoration-none']
                                     ) ?>
                                 <?php endforeach; ?>
+                                <?php if (count($tags) > $maxTags): ?>
+                                    <div class="mt-2">
+                                        <button class="btn btn-sm btn-outline-secondary w-100"
+                                                type="button"
+                                                data-bs-toggle="modal"
+                                                data-bs-target="#allTagsModal">
+                                            Показати всі теги (<?= count($tags) ?>)
+                                        </button>
+                                    </div>
+                                <?php endif; ?>
                             <?php endif; ?>
                         </div>
                     </div>

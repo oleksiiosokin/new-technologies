@@ -1,85 +1,176 @@
-:root{
-  --bg: #F1F6F9;
-  --primary: #394867;
-  --primary-2: #212A3E;
-  --muted: #9BA4B5;
-  --card: #ffffff;
-  --border: rgba(33,42,62,.10);
+:root {
+  /* Палітра "Nordic Blue" */
+  --bg: #E7EAF6;        /* Основний фон */
+  --card: #FFFFFF;      /* Білий фон для блоків */
+  --primary: #38598B;   /* Основний синій (Кнопки, Посилання) */
+  --primary-hover: #113F67; /* Темно-синій (Ховер) */
+  
+  --text: #113F67;      /* Темний текст (Замість чорного) */
+  --muted: #6B7C93;     /* Приглушений сіро-синій для дат */
+  --border: #A2A8D3;    /* Лавандовий для рамок */
 }
 
-#main{
-  padding-top: 24px;
+#main {
+  padding-top: 12px;
 }
 
-/* Base */
-body{
+body {
   background: var(--bg);
-  color: #0f172a;
+  color: var(--text);
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
 }
-a{
+
+a {
   color: var(--primary);
   text-decoration: none;
+  font-weight: 500;
+  transition: all 0.2s ease;
 }
-a:hover{ color: var(--primary-2); text-decoration: underline; }
 
-.container{ max-width: 1100px; }
+a:hover {
+  color: var(--primary-hover);
+  text-decoration: underline;
+}
 
-/* Navbar */
-.navbar{
-  background: rgba(33,42,62,.92) !important;
-  backdrop-filter: blur(10px);
+.container {
+  max-width: 1100px;
+}
+
+
+.navbar {
+  background: rgba(255, 255, 255, 0.90) !important; /* Напівпрозорий білий */
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
   padding-top: 10px;
   padding-bottom: 10px;
+  box-shadow: 0 4px 20px rgba(56, 89, 139, 0.08); /* Тінь в колір бренду */
 }
-.navbar .navbar-brand{ font-weight: 700; letter-spacing: .2px; }
-.navbar .nav-link{ color: rgba(255,255,255,.85) !important; }
-.navbar .nav-link:hover{ color: #fff !important; }
 
-/* Cards */
-.card{
-  border: 1px solid var(--border);
+.navbar .navbar-brand, 
+.navbar .navbar-brand-center {
+  font-weight: 800;
+  letter-spacing: .5px;
+  color: var(--primary) !important;
+}
+
+.navbar .nav-link {
+  color: var(--muted) !important;
+  font-weight: 500;
+}
+
+.navbar .nav-link:hover,
+.navbar .nav-link.active {
+  color: var(--primary) !important;
+}
+
+/* Cards (Пости і Сайдбар) */
+.card {
+  background-color: var(--card);
+  border: 1px solid rgba(162, 168, 211, 0.4); /* Напівпрозорий бордер */
   border-radius: 16px;
-  box-shadow: 0 10px 30px rgba(33,42,62,.06);
-  
-}
-.card-header{
-  background: transparent;
-  border-bottom: 1px solid var(--border);
-  font-weight: 600;
-  
+  box-shadow: 0 4px 15px rgba(56, 89, 139, 0.03); /* Дуже легка синя тінь */
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
 }
 
-/* Sidebar list */
-.list-group-item{
+.card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 30px rgba(56, 89, 139, 0.12) !important;
+  border-color: var(--primary);
+}
+
+.card-header {
+  background: transparent;
+  padding-left: 5;
+  border-bottom: 1px solid var(--border);
+  font-weight: 700;
+  color: var(--primary);
+  text-transform: uppercase;
+  font-size: 0.85rem;
+  letter-spacing: 0.5px;
+}
+
+/* Sidebar Elements */
+.sidebar {
+  background: transparent;
+  border-right: none;
+}
+
+.list-group-item {
+  background: transparent;
   border: 0;
   border-bottom: 1px solid var(--border);
-  padding: 12px 14px;
-}
-.list-group-item:last-child{ border-bottom: 0; }
-
-.list-group-item.active{
-  background: rgba(57,72,103,.12);
-  color: var(--primary-2);
-  font-weight: 700;
+  color: var(--text);
+  padding: 12px 0;
 }
 
-/* Badges */
-.badge.text-bg-secondary{
-  background: rgba(155,164,181,.25) !important;
-  color: var(--primary-2) !important;
-}
-.badge.text-bg-primary{
-  background: var(--primary) !important;
+.list-group-item:last-child {
+  border-bottom: 0;
 }
 
-/* Post list */
-.post-card .post-title{
+.list-group-item.active {
+  background: transparent;
+  color: var(--primary);
   font-weight: 800;
-  letter-spacing: -.2px;
+  padding-left: 8px;
+  border-left: 4px solid var(--primary); /* Активний елемент зліва */
 }
-.post-meta{
-  color: rgba(15,23,42,.60);
-  font-size: .9rem;
+
+/* Buttons */
+.btn-primary {
+  background-color: var(--primary);
+  border-color: var(--primary);
+  color: #fff;
+  border-radius: 12px;
+  padding: 8px 22px;
+  font-weight: 600;
+  box-shadow: 0 4px 12px rgba(56, 89, 139, 0.2); /* Тінь під кнопкою */
+}
+
+.btn-primary:hover {
+  background-color: var(--primary-hover);
+  border-color: var(--primary-hover);
+  box-shadow: 0 6px 16px rgba(17, 63, 103, 0.3);
+}
+
+.btn-outline-secondary {
+  border-color: var(--border);
+  color: var(--muted);
+}
+
+.btn-outline-secondary:hover {
+  background-color: var(--bg);
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+/* Tags */
+.badge.text-bg-secondary {
+  background-color: var(--bg) !important; /* Колір фону сайту */
+  color: var(--primary) !important;
+  border: 1px solid var(--border);
+  font-weight: 500;
+}
+
+.badge.text-bg-primary {
+  background-color: var(--primary) !important;
+  color: #fff !important;
+}
+
+/* Search Input */
+.sidebar-search-input {
+  background: #fff;
+  border: 1px solid var(--border);
+  color: var(--text);
+}
+
+.sidebar-search-input:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 4px rgba(162, 168, 211, 0.25); /* Лавандове світіння */
+}
+
+/* Post Meta */
+.post-meta {
+  color: var(--muted);
 }
 .post-card .btn-read{
   border-radius: 999px;
@@ -157,7 +248,7 @@ a:hover{ color: var(--primary-2); text-decoration: underline; }
 
 
 .navbar .nav-link.btn.btn-link{
-  color: rgba(255,255,255,.88) !important;
+  color: rgba(255, 0, 0, 0.88) !important;
   padding: 8px 12px;
   border-radius: 12px;
   background: rgba(255,255,255,.06);
@@ -165,6 +256,13 @@ a:hover{ color: var(--primary-2); text-decoration: underline; }
 }
 .navbar .nav-link.btn.btn-link:hover{
   background: rgba(255,255,255,.10);
+}
+
+.navbar-brand-left img{
+  height: 60px; 
+  width: auto;
+  display: block;
+  transition: height 0.3s ease;
 }
 
 .sidebar .card{
@@ -251,4 +349,12 @@ a:hover{ color: var(--primary-2); text-decoration: underline; }
 
 .card {
     position: relative;
+}
+
+
+.navbar .navbar-brand:hover,
+.navbar .navbar-brand-center:hover {
+  text-decoration: none !important;
+  color: var(--primary); 
+  opacity: 1; 
 }
