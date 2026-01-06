@@ -11,9 +11,26 @@ use app\models\Tag;
 use app\models\Comment;
 use yii\web\Response;
 use Yii;
+use yii\filters\VerbFilter;
+use yii\web\ForbiddenHttpException;
+
 
 final class PostController extends Controller
 {
+
+    public function behaviors(): array
+    {
+        return [
+            'verbs' => [
+                'class' => VerbFilter::class,
+                'actions' => [
+                    'delete-comment' => ['POST'],
+                ],
+            ],
+        ];
+    }
+
+
     public function actionIndex(): string
     {
         $this->fillSidebar(null, null);
@@ -112,6 +129,30 @@ final class PostController extends Controller
         Yii::$app->view->params['activeTagSlug'] = $activeTagSlug;
     }
 
-    
+    public function actionDeleteComment(int $id, string $slug): Response
+    {
+        if (Yii::$app->user->isGuest || (int)Yii::$app->user->identity->is_admin !== 1) {
+            throw new ForbiddenHttpException('Access denied.');
+        }
+
+        $post = Post::find()->where(['slug' => $slug])->one();
+        if ($post === null) {
+            throw new NotFoundHttpException('Post not found.');
+        }
+
+        $comment = Comment::find()->where(['id' => $id, 'post_id' => $post->id])->one();
+        if ($comment === null) {
+            throw new NotFoundHttpException('Comment not found.');
+        }
+
+        Comment::deleteAll(['parent_id' => (int)$comment->id]); // видалити відповіді
+        $comment->delete();
+
+        Yii::$app->session->setFlash('success', 'Коментар видалено.');
+
+        return $this->redirect(['post/view', 'slug' => $post->slug, '#' => 'comments']);
+    }
+
+
 
 }

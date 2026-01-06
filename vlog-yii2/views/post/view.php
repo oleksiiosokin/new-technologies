@@ -109,14 +109,28 @@ $rootComments = $model->getComments()->with('replies')->all();
                     <div class="d-flex justify-content-between flex-wrap gap-2">
                         <div>
                             <strong><?= Html::encode($c->author_name) ?></strong>
-                            <span class="text-muted ms-2"><?= Html::encode(date('Y-m-d H:i', (int)$c->created_at)) ?></span>
+                            <span class="text-muted ms-2"><?= Html::encode(date('d-m-Y H:i', (int)$c->created_at)) ?></span>
                         </div>
-                        <button class="btn btn-sm btn-outline-secondary"
-                                type="button"
-                                onclick="document.getElementById('comment-parent-id').value='<?= (int)$c->id ?>'; document.getElementById('comment-form-title').innerText='Відповідь користувачу <?=$c->author_name ?>'; document.getElementById('comment-author-name').focus();">
-                            Reply
-                        </button>
+
+                        <div class="d-flex gap-2">
+                            <button class="btn btn-sm btn-outline-secondary"
+                                    type="button"
+                                    onclick="document.getElementById('comment-parent-id').value='<?= (int)$c->id ?>'; document.getElementById('comment-form-title').innerText='Відповідь користувачу <?= Html::encode($c->author_name) ?>'; document.getElementById('comment-author-name').focus();">
+                                Reply
+                            </button>
+
+                            <?php if (!Yii::$app->user->isGuest && (int)Yii::$app->user->identity->is_admin === 1): ?>
+                                <?= Html::a('Delete', ['post/delete-comment', 'id' => (int)$c->id, 'slug' => $model->slug], [
+                                    'class' => 'btn btn-sm btn-outline-danger',
+                                    'data' => [
+                                        'method' => 'post',
+                                        'confirm' => 'Видалити цей коментар (і відповіді до нього)?',
+                                    ],
+                                ]) ?>
+                            <?php endif; ?>
+                        </div>
                     </div>
+
 
                     <div class="mt-2" style="white-space: pre-wrap;"><?= Html::encode($c->content) ?></div>
 
@@ -124,11 +138,24 @@ $rootComments = $model->getComments()->with('replies')->all();
                         <div class="mt-3 ms-3 ps-3 border-start">
                             <?php foreach ($c->replies as $r): ?>
                                 <div class="mb-2">
-                                    <div>
-                                        <strong><?= Html::encode($r->author_name) ?></strong>
-                                        <span class="text-muted ms-2"><?= Html::encode(date('Y-m-d H:i', (int)$r->created_at)) ?></span>
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <strong><?= Html::encode($r->author_name) ?></strong>
+                                            <span class="text-muted ms-2"><?= Html::encode(date('d-m-Y H:i', (int)$r->created_at)) ?></span>
+                                        </div>
+
+                                        <?php if (!Yii::$app->user->isGuest && (int)Yii::$app->user->identity->is_admin === 1): ?>
+                                            <?= Html::a('Delete', ['post/delete-comment', 'id' => (int)$r->id, 'slug' => $model->slug], [
+                                                'class' => 'btn btn-sm btn-outline-danger', // Класи як у головної кнопки
+                                                'data' => [
+                                                    'method' => 'post',
+                                                    'confirm' => 'Видалити цю відповідь?',
+                                                ],
+                                            ]) ?>
+                                        <?php endif; ?>
                                     </div>
-                                    <div style="white-space: pre-wrap;"><?= Html::encode($r->content) ?></div>
+
+                                    <div class="mt-1" style="white-space: pre-wrap;"><?= Html::encode($r->content) ?></div>
                                 </div>
                             <?php endforeach; ?>
                         </div>

@@ -48,6 +48,7 @@ $config = [
             'showScriptName' => false,
             'rules' => [
             '' => 'post/index',
+            'post/delete-comment' => 'post/delete-comment',
             'post/<slug:[A-Za-z0-9\-_]+>' => 'post/view',
             'category/<slug:[A-Za-z0-9\-_]+>' => 'category/view',
             'tag/<slug:[A-Za-z0-9\-_]+>' => 'tag/view',
