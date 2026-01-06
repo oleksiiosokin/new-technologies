@@ -124,8 +124,9 @@ $shareFacebook = 'https://www.facebook.com/sharer/sharer.php?' . http_build_quer
                             </button>
 
                             <?php if (!Yii::$app->user->isGuest && (int)Yii::$app->user->identity->is_admin === 1): ?>
-                                <?= Html::a('Delete', ['post/delete-comment', 'id' => (int)$c->id, 'slug' => $model->slug], [
-                                    'class' => 'btn btn-sm btn-outline-danger',
+                               <?= Html::a('<i class="bi bi-trash"></i>', ['post/delete-comment', 'id' => (int)$c->id, 'slug' => $model->slug], [
+                                                'class' => 'text-secondary p-0 hover-danger',
+                                                'title' => 'Видалити',
                                     'data' => [
                                         'method' => 'post',
                                         'confirm' => 'Видалити цей коментар (і відповіді до нього)?',
@@ -140,17 +141,17 @@ $shareFacebook = 'https://www.facebook.com/sharer/sharer.php?' . http_build_quer
                     <?php $replies = $repliesByParent[(int)$c->id] ?? []; ?>
                     <?php if (!empty($replies)): ?>
                         <div class="mt-3 ms-3 ps-3 border-start">
-                            <?php foreach ($replies as $r): ?>
-                                <div class="mb-2">
-                                    <div class="d-flex justify-content-between align-items-center">
+                            <?php foreach ($c->replies as $r): ?>
+                                <div class="mb-3 ps-3 border-start"> <div class="d-flex justify-content-between align-items-start">
                                         <div>
                                             <strong><?= Html::encode($r->author_name) ?></strong>
-                                            <span class="text-muted ms-2"><?= Html::encode(date('d-m-Y H:i', (int)$r->created_at)) ?></span>
+                                            <span class="text-muted ms-2 small"><?= date('d-m-Y H:i', (int)$r->created_at) ?></span>
                                         </div>
 
                                         <?php if (!Yii::$app->user->isGuest && (int)Yii::$app->user->identity->is_admin === 1): ?>
-                                            <?= Html::a('Delete', ['post/delete-comment', 'id' => (int)$r->id, 'slug' => $model->slug], [
-                                                'class' => 'btn btn-sm btn-outline-danger',
+                                            <?= Html::a('<i class="bi bi-trash"></i>', ['post/delete-comment', 'id' => (int)$r->id, 'slug' => $model->slug], [
+                                                'class' => 'text-secondary p-0 hover-danger',
+                                                'title' => 'Видалити',
                                                 'data' => [
                                                     'method' => 'post',
                                                     'confirm' => 'Видалити цю відповідь?',
@@ -158,8 +159,7 @@ $shareFacebook = 'https://www.facebook.com/sharer/sharer.php?' . http_build_quer
                                             ]) ?>
                                         <?php endif; ?>
                                     </div>
-
-                                    <div class="mt-1" style="white-space: pre-wrap;"><?= Html::encode($r->content) ?></div>
+                                    <div class="mt-1 text-break"><?= nl2br(Html::encode($r->content)) ?></div>
                                 </div>
                             <?php endforeach; ?>
                         </div>

@@ -8,7 +8,7 @@
 }
 
 #main{
-  padding-top: 72px;
+  padding-top: 24px;
 }
 
 /* Base */
@@ -148,6 +148,7 @@ a:hover{ color: var(--primary-2); text-decoration: underline; }
 @media (min-width: 992px){
   .sidebar{
     position: sticky;
+    color: rgba(255,255,255,0);
     top: 72px;               
     height: calc(100vh - 72px);
     overflow: auto;
@@ -166,20 +167,8 @@ a:hover{ color: var(--primary-2); text-decoration: underline; }
   background: rgba(255,255,255,.10);
 }
 
-.sidebar{
-  background: var(--card);
-  border-right: 1px solid var(--border);
-  min-height: calc(100vh - 72px);
-}
-
-.sidebar{
-  background: rgba(255,255,255,.70);
-  backdrop-filter: blur(6px);
-}
-
-
 .sidebar .card{
-  box-shadow: none;      /* в сайдбарі тінь зайва */
+  box-shadow: none; 
   border-radius: 14px;
 }
 
@@ -245,4 +234,21 @@ a:hover{ color: var(--primary-2); text-decoration: underline; }
 .tag-pill{
   padding: .45rem .6rem;
   border-radius: 999px;
+}
+
+
+.hover-danger:hover {
+    color: #dc3545 !important;
+    text-decoration: none;
+}
+
+
+.card.shadow-sm:hover {
+    box-shadow: 0 .5rem 1rem rgba(0,0,0,.15)!important;
+    transition: box-shadow 0.3s ease-in-out;
+}
+
+
+.card {
+    position: relative;
 }

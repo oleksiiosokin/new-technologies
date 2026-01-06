@@ -31,6 +31,7 @@ $activeTagSlug = $this->params['activeTagSlug'] ?? null;
 <html lang="<?= Yii::$app->language ?>" class="h-100">
 <head>
     <title><?= Html::encode($this->title) ?></title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
     <?php $this->head() ?>
 </head>
 <body class="d-flex flex-column h-100">
@@ -39,13 +40,12 @@ $activeTagSlug = $this->params['activeTagSlug'] ?? null;
 <header id="header">
     <?php
     NavBar::begin([
-        'options' => [
-            'class' => 'navbar navbar-expand-md navbar-dark fixed-top'
-        ],
+        'options' => ['class' => 'navbar navbar-expand-md navbar-dark custom-navbar'],
         'innerContainerOptions' => [
             'class' => 'container position-relative'
         ],
     ]);
+    
 ?>
         <a class="navbar-brand-left d-flex align-items-center" href="<?= Yii::$app->homeUrl ?>">
         <img src="<?= Yii::getAlias('@web/images/Logo.png') ?>" alt="Logo">
@@ -87,94 +87,68 @@ $activeTagSlug = $this->params['activeTagSlug'] ?? null;
         <div class="row g-0">
 
             <aside class="col-12 col-md-3 col-xl-2 sidebar">
-                <div class="card sidebar-search-card mb-3">
-                    <div class="card-body">
-                        <div class="sidebar-search-title">Пошук</div>
+                <div class="p-3 p-lg-4 h-100"> <div class="card sidebar-search-card mb-3">
+                        <div class="card-body">
+                            <div class="sidebar-search-title">Пошук</div>
 
-                        <?= Html::beginForm(['post/index'], 'get', ['class' => 'sidebar-search-form']) ?>
-                            <?= Html::textInput('q', $q, [
-                                'class' => 'form-control sidebar-search-input',
-                                'placeholder' => 'Назва або текст…',
-                                'autocomplete' => 'off',
-                            ]) ?>
-
-                            <?= Html::submitButton('Go', ['class' => 'btn btn-primary sidebar-search-btn']) ?>
-
-                            <?php if ($q !== ''): ?>
-                                <?= Html::a('×', ['post/index'], [
-                                    'class' => 'btn btn-outline-secondary sidebar-search-clear',
-                                    'title' => 'Очистити',
-                                    'aria-label' => 'Очистити',
+                            <?= Html::beginForm(['post/index'], 'get', ['class' => 'sidebar-search-form']) ?>
+                                <?= Html::textInput('q', $q, [
+                                    'class' => 'form-control sidebar-search-input',
+                                    'placeholder' => 'Назва або текст…',
+                                    'autocomplete' => 'off',
                                 ]) ?>
-                            <?php endif; ?>
-                        <?= Html::endForm() ?>
-                    </div>
-                </div>
-
-                <div class="card mb-3">
-                    <div class="card-header fw-semibold">Категорії</div>
-                    <div class="list-group list-group-flush">
-                        <?= Html::a(
-                            'Усі пости',
-                            ['post/index'],
-                            ['class' => 'list-group-item list-group-item-action' . (($activeCategorySlug === null && $activeTagSlug === null) ? ' active' : '')]
-                        ) ?>
-
-                        <?php
-                        $maxCats = 8;
-                        $catsLimited = array_slice($categories, 0, $maxCats);
-                        ?>
-                        <?php foreach ($catsLimited as $cat): ?>
-                            <?= Html::a(
-                                Html::encode($cat->name),
-                                ['category/view', 'slug' => $cat->slug],
-                                ['class' => 'list-group-item list-group-item-action' . ($activeCategorySlug === $cat->slug ? ' active' : '')]
-                            ) ?>
-                        <?php endforeach; ?>
-                    </div>
-                    <?php if (count($categories) > $maxCats): ?>
-                            <div class="p-2">
-                                <button class="btn btn-sm btn-outline-secondary w-100"
-                                        type="button"
-                                        data-bs-toggle="modal"
-                                        data-bs-target="#allCategoriesModal">
-                                    Показати всі категорії (<?= count($categories) ?>)
+                                
+                                <button type="submit" class="btn btn-primary sidebar-search-btn">
+                                    <i class="bi bi-search"></i>
                                 </button>
-                            </div>
-                        <?php endif; ?>
-                </div>
 
-                <div class="card">
-                    <div class="card-header fw-semibold">Теги</div>
-                    <div class="card-body">
-                        <?php if (empty($tags)): ?>
-                            <div class="text-muted">Нема тегів</div>
-                        <?php else: ?>
-                            <?php
-                            $maxTags = 12;
-                            $tagsLimited = array_slice($tags, 0, $maxTags);
-                            ?>
-                            <?php foreach ($tagsLimited as $tag): ?>
+                                <?php if ($q !== ''): ?>
+                                    <?= Html::a('<i class="bi bi-x"></i>', ['post/index'], [
+                                        'class' => 'btn btn-outline-secondary sidebar-search-clear',
+                                        'title' => 'Очистити',
+                                    ]) ?>
+                                <?php endif; ?>
+                            <?= Html::endForm() ?>
+                        </div>
+                    </div>
+
+                    <div class="card mb-3">
+                        <div class="card-header fw-semibold">Категорії</div>
+                        <div class="list-group list-group-flush">
+                            <?= Html::a(
+                                'Усі пости',
+                                ['post/index'],
+                                ['class' => 'list-group-item list-group-item-action' . (($activeCategorySlug === null && $activeTagSlug === null) ? ' active' : '')]
+                            ) ?>
+
+                            <?php foreach ($categories as $cat): ?>
                                 <?= Html::a(
-                                    Html::encode($tag->name),
-                                    ['tag/view', 'slug' => $tag->slug],
-                                    ['class' => 'badge text-bg-' . ($activeTagSlug === $tag->slug ? 'primary' : 'secondary') . ' me-1 mb-1 text-decoration-none']
+                                    Html::encode($cat->name),
+                                    ['category/view', 'slug' => $cat->slug],
+                                    ['class' => 'list-group-item list-group-item-action' . ($activeCategorySlug === $cat->slug ? ' active' : '')]
                                 ) ?>
                             <?php endforeach; ?>
-                            <?php if (count($tags) > $maxTags): ?>
-                                <div class="mt-2">
-                                    <button class="btn btn-sm btn-outline-secondary w-100"
-                                            type="button"
-                                            data-bs-toggle="modal"
-                                            data-bs-target="#allTagsModal">
-                                        Показати всі теги (<?= count($tags) ?>)
-                                    </button>
-                                </div>
-                            <?php endif; ?>
-                                    
-                        <?php endif; ?>
+                        </div>
                     </div>
-                </div>
+
+                    <div class="card">
+                        <div class="card-header fw-semibold">Теги</div>
+                        <div class="card-body">
+                            <?php if (empty($tags)): ?>
+                                <div class="text-muted">Нема тегів</div>
+                            <?php else: ?>
+                                <?php foreach ($tags as $tag): ?>
+                                    <?= Html::a(
+                                        Html::encode($tag->name),
+                                        ['tag/view', 'slug' => $tag->slug],
+                                        ['class' => 'badge text-bg-' . ($activeTagSlug === $tag->slug ? 'primary' : 'secondary') . ' me-1 mb-1 text-decoration-none']
+                                    ) ?>
+                                <?php endforeach; ?>
+                            <?php endif; ?>
+                        </div>
+                    </div>
+
+                </div> 
             </aside>
 
             <div class="col-12 col-md-9 col-xl-10 content-area">
