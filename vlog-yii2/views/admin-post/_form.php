@@ -33,7 +33,7 @@ $categories = ArrayHelper::map(
     
     <?= $form->field($model, 'tagsInput')
     ->textInput(['placeholder' => 'Напр: php, yii2, security'])
-    ->hint('Вводь через кому. Існуючі теги повторно не створюються.') ?>
+    ->hint('Теги вводяться через кому.') ?>
 
 
     <?= $form->field($model, 'status')->dropDownList([

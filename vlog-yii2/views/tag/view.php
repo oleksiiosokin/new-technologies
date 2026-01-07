@@ -30,45 +30,73 @@ $pagination = $dataProvider->getPagination();
     <?php foreach ($models as $post): ?>
         <div class="card post-card mb-3">
             <div class="card-body">
-                <h2 class="h4 post-title mb-1">
-                    <?= Html::a(
-                        Html::encode($post->title),
-                        ['post/view', 'slug' => $post->slug],
-                        ['class' => 'text-decoration-none']
-                    ) ?>
-                </h2>
-
-                <div class="post-meta mb-2">
-                    <?= Html::encode(date('Y-m-d H:i', (int)($post->published_at ?? $post->created_at))) ?>
-                    ·
-                    <?= Html::a(
-                        Html::encode($post->category?->name ?? '—'),
-                        $post->category ? ['category/view', 'slug' => $post->category->slug] : ['post/index'],
-                        ['class' => 'text-decoration-none']
-                    ) ?>
-                </div>
-
-                <p class="mb-3">
-                    <?= Html::encode(StringHelper::truncate(strip_tags($post->content), 220)) ?>
-                </p>
-
-                <?php if ($post->tags): ?>
-                    <div class="mb-3">
-                        <?php foreach ($post->tags as $t): ?>
+                <div class="d-flex justify-content-between align-items-start gap-3">
+                    <div class="flex-grow-1">
+                        <?php if (!empty($post->image_path)): ?>
+                        <div class="post-cover-wrap mb-3">
+                            <?= Html::img('/' . ltrim($post->image_path, '/'), [
+                                'alt' => $post->title,
+                                'class' => 'img-fluid post-cover',
+                            ]) ?>
+                        </div>
+                    <?php endif; ?>
+                        <h2 class="h4 post-title mb-1">
                             <?= Html::a(
-                                Html::encode($t->name),
-                                ['tag/view', 'slug' => $t->slug],
-                                ['class' => 'badge text-bg-' . ($t->slug === $tag->slug ? 'primary' : 'secondary') . ' me-1 mb-1 text-decoration-none']
+                                Html::encode($post->title),
+                                ['post/view', 'slug' => $post->slug],
+                                ['class' => 'text-decoration-none']
                             ) ?>
-                        <?php endforeach; ?>
-                    </div>
-                <?php endif; ?>
+                        </h2>
 
-                <?= Html::a(
-                    'Read more →',
-                    ['post/view', 'slug' => $post->slug],
-                    ['class' => 'btn btn-sm btn-outline-secondary btn-read']
-                ) ?>
+                        <?php
+                        $publishedTs = (int)($post->published_at ?: $post->created_at);
+                        $updatedTs   = (int)($post->updated_at ?: 0);
+                        $createdTs   = (int)($post->created_at ?: 0);
+
+                        $showUpdated = $updatedTs && $createdTs && $updatedTs > $createdTs;
+                        ?>
+                        <div class="post-meta mb-2">
+                            <span><strong>Опубліковано:</strong> <?= Html::encode(date('d-m-Y H:i', $publishedTs)) ?></span>
+
+                            <?php if ($showUpdated): ?>
+                                <span class="ms-3"><strong>Оновлено:</strong> <?= Html::encode(date('d-m-Y H:i', $updatedTs)) ?></span>
+                            <?php endif; ?>
+
+                            <span class="mx-2">·</span>
+                                
+                            <?= Html::a(
+                                Html::encode($post->category?->name ?? '—'),
+                                $post->category ? ['category/view', 'slug' => $post->category->slug] : ['post/index'],
+                                ['class' => 'text-decoration-none']
+                            ) ?>
+                        </div>
+
+
+                        <p class="mb-3">
+                            <?= Html::encode(StringHelper::truncate(strip_tags($post->content), 220)) ?>
+                        </p>
+
+                        <?php if ($post->tags): ?>
+                            <div class="mb-3">
+                                <?php foreach ($post->tags as $tag): ?>
+                                    <?= Html::a(
+                                        Html::encode($tag->name),
+                                        ['tag/view', 'slug' => $tag->slug],
+                                        ['class' => 'badge text-bg-secondary me-1 mb-1 text-decoration-none']
+                                    ) ?>
+                                <?php endforeach; ?>
+                            </div>
+                        <?php endif; ?>
+
+                        <?= Html::a(
+                            'Read more →',
+                            ['post/view', 'slug' => $post->slug],
+                            ['class' => 'btn btn-sm btn-outline-secondary btn-read']
+                        ) ?>
+                    </div>
+
+                    
+                </div>
             </div>
         </div>
     <?php endforeach; ?>

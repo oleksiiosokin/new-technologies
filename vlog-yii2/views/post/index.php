@@ -23,7 +23,7 @@ $pagination = $dataProvider->getPagination();
                 <div class="d-flex justify-content-between align-items-start gap-3">
                     <div class="flex-grow-1">
                         <?php if (!empty($post->image_path)): ?>
-                        <div class="post-cover-wrap mb-3">
+                        <div class="post-cover-wrap list-cover mb-3">
                             <?= Html::img('/' . ltrim($post->image_path, '/'), [
                                 'alt' => $post->title,
                                 'class' => 'img-fluid post-cover',
